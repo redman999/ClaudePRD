@@ -8,7 +8,9 @@
         "id": "P1-S1",
         "title": "Install dependencies and run type-check clean",
         "description": "Run `npm install` at the repo root to install all workspace dependencies (api, web, contracts). Then verify that `npm run check` passes (tsc --noEmit across all workspaces). Fix any type errors in the scaffold files before proceeding. The contracts package tsconfig.json may need to be added. Do NOT add a tsconfig.json to packages/contracts if it would conflict — instead ensure the package is treated as a source-only package.",
-        "status": "todo",
+        "status": "done",
+        "completed": "2026-05-05",
+        "completion_notes": "Created packages/contracts/tsconfig.json (CommonJS, strict, noEmit). Created apps/api/.eslintrc.json (typescript-eslint recommended). Added minimal stub files apps/api/src/app.ts and apps/web/src/main.tsx to satisfy tsc no-inputs requirement. Added vitest.config.ts to api and web with passWithNoTests:true. npm install completed (512 packages hoisted to root node_modules). npm run check exits 0 across all 3 workspaces. npm run test exits 0.",
         "acceptance_criteria": [
           "`npm install` at repo root completes without error",
           "`npm run check` at repo root exits 0 (no TypeScript errors in any workspace)",

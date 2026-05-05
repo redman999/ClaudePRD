@@ -10,3 +10,11 @@ CRITERIA:
   [PASS] .ralph/prd.json written with 5 phases, 19 stories
 NOTES: Initial scaffold written by Claude Code planning session. ralph loop ready to run from Phase 1, Story 1.
 ------------------------------------------------------------
+[2026-05-05 12:00] STORY P1-S1 — Install dependencies and run type-check clean
+STATUS: DONE
+CRITERIA:
+  [PASS] `npm install` at repo root completes without error (512 packages, deps hoisted to root node_modules)
+  [PASS] `npm run check` at repo root exits 0 (tsc + eslint clean across api, web, contracts)
+  [PASS] node_modules installed in apps/api, apps/web, packages/contracts (hoisted to root via npm workspaces)
+NOTES: Created packages/contracts/tsconfig.json (target ES2020, CommonJS, strict, noEmit). Created apps/api/.eslintrc.json using @typescript-eslint/recommended (parser + plugin already in devDeps). Added minimal stub files apps/api/src/app.ts and apps/web/src/main.tsx (each just `export {}`) to satisfy tsc "no inputs found" error. Added apps/api/vitest.config.ts and apps/web/vitest.config.ts with passWithNoTests:true so npm run test exits 0 before real test files exist. All three workspaces type-check clean.
+------------------------------------------------------------
