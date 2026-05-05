@@ -49,6 +49,15 @@ CRITERIA:
 NOTES: Created apps/web/src/main.tsx with ReactDOM.createRoot, BrowserRouter, StrictMode. Created App.tsx with 5 placeholder routes (/, /new, /projects/:id, /join/:shareToken, /session/:sessionId). Created index.css with @tailwind directives, tailwind.config.ts with content: ['./index.html', './src/**/*.{ts,tsx}'], and postcss.config.js with tailwindcss + autoprefixer plugins. npm run check exits 0 across all 3 workspaces. npm run test exits 0. Vite dev server serves correct HTML. Phase 1 complete — Phase 2 activated.
 ------------------------------------------------------------
 ------------------------------------------------------------
+[2026-05-05 21:50] STORY P2-S2 — GET /api/projects/join/:shareToken route
+STATUS: DONE
+CRITERIA:
+  [PASS] GET /api/projects/join/<shareToken> returns {id, name, description, topic} — confirmed with live test
+  [PASS] GET /api/projects/join/bad-token returns 404 {"error":"Project not found"}
+  [PASS] npm run check exits 0 across all workspaces
+NOTES: Added GET /join/:shareToken route to apps/api/src/routes/projects.ts, placed before the /:id wildcard route so Express matches 'join' as a literal segment, not an id. Uses Prisma select to return only {id, name, description, topic} — no PRD content or sessions. Verified existing GET /:id route continues working (no regression).
+------------------------------------------------------------
+------------------------------------------------------------
 [2026-05-05 19:12] STORY P2-S1 — POST /api/projects and GET /api/projects/:id routes
 STATUS: DONE
 CRITERIA:

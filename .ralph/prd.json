@@ -106,7 +106,9 @@
         "id": "P2-S2",
         "title": "GET /api/projects/join/:shareToken route",
         "description": "Add `GET /api/projects/join/:shareToken` to the projects router. Returns `{id, name, description, topic}` — just enough for the stakeholder landing page (no PRD content, no sessions). Return 404 `{error:'Project not found'}` if the token doesn't match. IMPORTANT: register this route BEFORE `/:id` so Express doesn't match 'join' as an id.",
-        "status": "todo",
+        "status": "done",
+        "completed": "2026-05-05",
+        "completion_notes": "Added GET /join/:shareToken route in projects.ts before the /:id wildcard. Uses Prisma select to return only {id, name, description, topic}. Returns 404 for unknown tokens. Tested live against running API. npm run check exits 0.",
         "acceptance_criteria": [
           "`curl -s http://localhost:4003/api/projects/join/<shareToken>` returns `{id, name, description, topic}`",
           "`curl -s http://localhost:4003/api/projects/join/bad-token` returns 404",

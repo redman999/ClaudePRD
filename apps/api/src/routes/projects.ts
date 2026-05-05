@@ -38,6 +38,24 @@ router.get('/', async (_req: Request, res: Response) => {
   }
 })
 
+// GET /api/projects/join/:shareToken — must be before /:id
+router.get('/join/:shareToken', async (req: Request, res: Response) => {
+  try {
+    const project = await prisma.project.findUnique({
+      where: { shareToken: req.params.shareToken },
+      select: { id: true, name: true, description: true, topic: true },
+    })
+
+    if (!project) {
+      return res.status(404).json({ error: 'Project not found' })
+    }
+
+    return res.json(project)
+  } catch (err) {
+    return res.status(500).json({ error: 'Failed to fetch project' })
+  }
+})
+
 // GET /api/projects/:id
 router.get('/:id', async (req: Request, res: Response) => {
   try {
