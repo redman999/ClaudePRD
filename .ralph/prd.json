@@ -82,7 +82,7 @@
   {
     "id": "P2",
     "name": "Phase 2 — Project Management",
-    "status": "active",
+    "status": "done",
     "stories": [
       {
         "id": "P2-S1",
@@ -156,7 +156,9 @@
         "id": "P2-S5",
         "title": "Project Dashboard shell — share link and session list placeholder",
         "description": "Implement `apps/web/src/pages/ProjectDashboard.tsx`. Fetch `GET /api/projects/:id`. Display: project name + description + topic header, the full shareable link (`window.location.origin + '/join/' + shareToken`) with a copy-to-clipboard button, a 'Sessions' section (empty state: 'No sessions yet — share the link above'), and a 'PRD' section (empty state: 'PRD will appear here once sessions complete'). No PRD content yet — that's Phase 4.",
-        "status": "todo",
+        "status": "done",
+        "completed": "2026-05-05",
+        "completion_notes": "Created apps/web/src/pages/ProjectDashboard.tsx: fetches GET /api/projects/:id via useParams, shows loading skeleton, error state, and on success renders project name/description/topic, share link (window.location.origin + /join/ + shareToken) with copy-to-clipboard button and 'Copied!' confirmation, Sessions empty state, and PRD empty state. Updated App.tsx to import real ProjectDashboard component. npm run check and npm run test both exit 0.",
         "acceptance_criteria": [
           "Navigating to /projects/:id shows the project name and share link",
           "Copy button copies the share link to clipboard and shows a brief 'Copied!' confirmation",
@@ -173,7 +175,7 @@
   {
     "id": "P3",
     "name": "Phase 3 — Session & Chat",
-    "status": "pending",
+    "status": "active",
     "stories": [
       {
         "id": "P3-S1",

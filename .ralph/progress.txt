@@ -88,3 +88,14 @@ CRITERIA:
   [PASS] npm run check in apps/web exits 0
 NOTES: Created apps/web/src/pages/NewProject.tsx with a controlled React form: three required fields (name, description, topic) and one optional field (targetAudience). Client-side validate() runs on submit before any fetch — sets per-field errors and returns early if any field is missing. On valid submit, POST /api/projects with JSON body; on success, navigate to /projects/:id via useNavigate; on non-2xx, extract the error message and show it above the form. Loading spinner renders inside the submit button and disables the form during the API call. Updated App.tsx to import from pages/NewProject rather than the inline stub. npm run check and npm run test both exit 0.
 ------------------------------------------------------------
+------------------------------------------------------------
+[2026-05-05 22:00] STORY P2-S5 — Project Dashboard shell — share link and session list placeholder
+STATUS: DONE
+CRITERIA:
+  [PASS] Navigating to /projects/:id shows the project name and share link — fetches GET /api/projects/:id, renders name, description, topic, and share link
+  [PASS] Copy button copies the share link to clipboard and shows brief 'Copied!' confirmation — navigator.clipboard.writeText, setCopied(true) with 2s timeout
+  [PASS] Sessions section shows empty state — 'No sessions yet — share the link above'
+  [PASS] PRD section shows empty state — 'PRD will appear here once sessions complete'
+  [PASS] npm run check exits 0 — tsc + eslint clean across all workspaces
+NOTES: Created apps/web/src/pages/ProjectDashboard.tsx: reads :id from useParams, fetches project via GET /api/projects/:id, renders loading skeleton, error state, and on success shows project header (name, description, topic), share link section with copy-to-clipboard button, Sessions empty-state card, and PRD empty-state card. Updated App.tsx to import real ProjectDashboard instead of inline stub. Phase 2 complete — Phase 3 now active.
+------------------------------------------------------------
