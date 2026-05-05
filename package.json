@@ -1,0 +1,19 @@
+{
+  "name": "claudeprd",
+  "private": true,
+  "workspaces": [
+    "apps/api",
+    "apps/web",
+    "packages/contracts"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspaces --if-present",
+    "build": "npm run build --workspaces --if-present",
+    "check": "npm run check --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "db:migrate": "npm --workspace apps/api run db:migrate",
+    "db:generate": "npm --workspace apps/api run db:generate",
+    "infra:up": "docker compose -f docker-compose.yml up -d",
+    "infra:down": "docker compose -f docker-compose.yml down"
+  }
+}

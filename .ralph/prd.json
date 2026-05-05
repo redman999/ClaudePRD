@@ -1,0 +1,378 @@
+[
+  {
+    "id": "P1",
+    "name": "Phase 1 — Foundation",
+    "status": "active",
+    "stories": [
+      {
+        "id": "P1-S1",
+        "title": "Install dependencies and run type-check clean",
+        "description": "Run `npm install` at the repo root to install all workspace dependencies (api, web, contracts). Then verify that `npm run check` passes (tsc --noEmit across all workspaces). Fix any type errors in the scaffold files before proceeding. The contracts package tsconfig.json may need to be added. Do NOT add a tsconfig.json to packages/contracts if it would conflict — instead ensure the package is treated as a source-only package.",
+        "status": "todo",
+        "acceptance_criteria": [
+          "`npm install` at repo root completes without error",
+          "`npm run check` at repo root exits 0 (no TypeScript errors in any workspace)",
+          "node_modules installed in apps/api, apps/web, packages/contracts"
+        ],
+        "output_files": [
+          "packages/contracts/tsconfig.json"
+        ]
+      },
+      {
+        "id": "P1-S2",
+        "title": "Start Postgres and run initial Prisma migration",
+        "description": "Start the Postgres container via `docker compose up -d postgres`. Copy `apps/api/.env.example` to `apps/api/.env`. Run `cd apps/api && npx prisma migrate dev --name init` to create the initial migration and run it. Verify the Project and Session tables exist. Then run `npx prisma generate` to generate the Prisma client.",
+        "status": "todo",
+        "acceptance_criteria": [
+          "`docker compose ps` shows postgres container healthy on port 5436",
+          "`cd apps/api && npx prisma migrate status` shows 1 applied migration (init)",
+          "Project and Session tables exist: `cd apps/api && npx prisma db execute --stdin <<< \"SELECT tablename FROM pg_tables WHERE schemaname='public';\"` lists both",
+          "`@prisma/client` generated (node_modules/.prisma/client exists in apps/api)"
+        ],
+        "output_files": [
+          "apps/api/.env",
+          "apps/api/prisma/migrations/init/migration.sql"
+        ]
+      },
+      {
+        "id": "P1-S3",
+        "title": "Express API skeleton with health check",
+        "description": "Create `apps/api/src/app.ts` with a minimal Express app: CORS (allow all origins for dev), JSON body parser, morgan logging, a `GET /health` route returning `{status:'ok',service:'claudeprd-api',version:'0.1.0'}`, and a basic error handler middleware. The app should listen on the PORT env var (default 4003). Create `apps/api/src/middleware/error.ts` with the error handler. Start the server and verify the health endpoint responds.",
+        "status": "todo",
+        "acceptance_criteria": [
+          "`npm run dev` in apps/api starts without errors (ts-node-dev)",
+          "`curl -s http://localhost:4003/health` returns `{\"status\":\"ok\"}`",
+          "CORS header present: `curl -s -I -H 'Origin: http://localhost:5182' http://localhost:4003/health` includes `Access-Control-Allow-Origin`",
+          "`npm run check` still exits 0 after adding these files"
+        ],
+        "output_files": [
+          "apps/api/src/app.ts",
+          "apps/api/src/middleware/error.ts"
+        ]
+      },
+      {
+        "id": "P1-S4",
+        "title": "Vite + React + Tailwind scaffold with React Router",
+        "description": "Create the minimal React app scaffold: `apps/web/src/main.tsx` (ReactDOM.createRoot, BrowserRouter wrapper), `apps/web/src/App.tsx` (React Router Routes with placeholder routes for /, /new, /projects/:id, /join/:shareToken, /session/:sessionId), `apps/web/tailwind.config.ts`, `apps/web/postcss.config.js`, and `apps/web/src/index.css` with Tailwind directives. Each placeholder route can render a simple `<div>Page name</div>`. Verify the dev server starts and shows a page.",
+        "status": "todo",
+        "acceptance_criteria": [
+          "`npm run dev` in apps/web starts on port 5182 without errors",
+          "`curl -s http://localhost:5182` returns HTML with `<div id=\"root\">`",
+          "`npm run check` in apps/web exits 0 (no TS errors)",
+          "Tailwind classes compile: index.css processed by PostCSS"
+        ],
+        "output_files": [
+          "apps/web/src/main.tsx",
+          "apps/web/src/App.tsx",
+          "apps/web/src/index.css",
+          "apps/web/tailwind.config.ts",
+          "apps/web/postcss.config.js"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "P2",
+    "name": "Phase 2 — Project Management",
+    "status": "pending",
+    "stories": [
+      {
+        "id": "P2-S1",
+        "title": "POST /api/projects and GET /api/projects/:id routes",
+        "description": "Create `apps/api/src/routes/projects.ts` with:\n- `POST /api/projects`: validate body with CreateProjectSchema from contracts, create Project in DB with a cuid shareToken, return `{id, shareToken, ...project}`\n- `GET /api/projects`: return all projects ordered by createdAt desc, each with session count\n- `GET /api/projects/:id`: return full project with sessions array (messages parsed from JSON)\nRegister the router in app.ts under `/api/projects`. Use Zod for input validation — return 400 with `{error, issues}` on validation failure.",
+        "status": "todo",
+        "acceptance_criteria": [
+          "`curl -s -X POST http://localhost:4003/api/projects -H 'Content-Type: application/json' -d '{\"name\":\"Test\",\"description\":\"Desc\",\"topic\":\"Topic\"}' | jq .id` returns a cuid string",
+          "`curl -s http://localhost:4003/api/projects` returns JSON array with the created project",
+          "`curl -s http://localhost:4003/api/projects/<id>` returns the project with `sessions: []`",
+          "Missing required field returns 400 with `{\"error\":\"Validation failed\"}`",
+          "`npm run check` exits 0"
+        ],
+        "output_files": [
+          "apps/api/src/routes/projects.ts"
+        ]
+      },
+      {
+        "id": "P2-S2",
+        "title": "GET /api/projects/join/:shareToken route",
+        "description": "Add `GET /api/projects/join/:shareToken` to the projects router. Returns `{id, name, description, topic}` — just enough for the stakeholder landing page (no PRD content, no sessions). Return 404 `{error:'Project not found'}` if the token doesn't match. IMPORTANT: register this route BEFORE `/:id` so Express doesn't match 'join' as an id.",
+        "status": "todo",
+        "acceptance_criteria": [
+          "`curl -s http://localhost:4003/api/projects/join/<shareToken>` returns `{id, name, description, topic}`",
+          "`curl -s http://localhost:4003/api/projects/join/bad-token` returns 404",
+          "`npm run check` exits 0"
+        ],
+        "output_files": [
+          "apps/api/src/routes/projects.ts"
+        ]
+      },
+      {
+        "id": "P2-S3",
+        "title": "Home page — project list",
+        "description": "Implement `apps/web/src/pages/Home.tsx`. Fetch `GET /api/projects` on mount (use native fetch, no extra library). Display a list of projects: project name, description (truncated to 80 chars), session count badge, last updated date. Include a prominent 'New Project' button linking to `/new`. Show a loading skeleton while fetching and an empty state ('No projects yet — create your first one') when the list is empty. Use Tailwind for styling.",
+        "status": "todo",
+        "acceptance_criteria": [
+          "Navigating to http://localhost:5182/ shows a project list or empty state",
+          "After creating a project via API, refreshing the page shows it in the list",
+          "'New Project' button navigates to /new",
+          "`npm run check` in apps/web exits 0"
+        ],
+        "output_files": [
+          "apps/web/src/pages/Home.tsx"
+        ]
+      },
+      {
+        "id": "P2-S4",
+        "title": "New Project form and creation flow",
+        "description": "Implement `apps/web/src/pages/NewProject.tsx`. Form fields: Project Name (required), Description (required, textarea), Topic/Focus Area (required, e.g. 'Enterprise SaaS', 'Mobile App'), Target Audience (optional). On submit: POST to `/api/projects`, then navigate to `/projects/:id` on success. Show inline validation errors before submit. Show a loading spinner during the API call. Handle and display API errors.",
+        "status": "todo",
+        "acceptance_criteria": [
+          "Submitting the form with valid data creates a project and redirects to /projects/:id",
+          "Submitting with empty required fields shows validation errors without making an API call",
+          "The API error message is shown if the POST fails",
+          "`npm run check` in apps/web exits 0"
+        ],
+        "output_files": [
+          "apps/web/src/pages/NewProject.tsx"
+        ]
+      },
+      {
+        "id": "P2-S5",
+        "title": "Project Dashboard shell — share link and session list placeholder",
+        "description": "Implement `apps/web/src/pages/ProjectDashboard.tsx`. Fetch `GET /api/projects/:id`. Display: project name + description + topic header, the full shareable link (`window.location.origin + '/join/' + shareToken`) with a copy-to-clipboard button, a 'Sessions' section (empty state: 'No sessions yet — share the link above'), and a 'PRD' section (empty state: 'PRD will appear here once sessions complete'). No PRD content yet — that's Phase 4.",
+        "status": "todo",
+        "acceptance_criteria": [
+          "Navigating to /projects/:id shows the project name and share link",
+          "Copy button copies the share link to clipboard and shows a brief 'Copied!' confirmation",
+          "Sessions section shows empty state",
+          "PRD section shows empty state",
+          "`npm run check` exits 0"
+        ],
+        "output_files": [
+          "apps/web/src/pages/ProjectDashboard.tsx"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "P3",
+    "name": "Phase 3 — Session & Chat",
+    "status": "pending",
+    "stories": [
+      {
+        "id": "P3-S1",
+        "title": "POST /api/sessions and GET /api/sessions/:id routes",
+        "description": "Create `apps/api/src/routes/sessions.ts`. `POST /api/sessions`: validate body (shareToken, name, role) using CreateSessionSchema, look up project by shareToken (404 if not found), create Session row with status='active' and messages='[]', return `{id, projectId, name, role, status, messages:[], createdAt}`. `GET /api/sessions/:id`: return session with messages parsed from JSON string to array. Register in app.ts under `/api/sessions`.",
+        "status": "todo",
+        "acceptance_criteria": [
+          "`curl -s -X POST http://localhost:4003/api/sessions -H 'Content-Type: application/json' -d '{\"shareToken\":\"<token>\",\"name\":\"Alice\",\"role\":\"Developer\"}' | jq .id` returns a session cuid",
+          "`curl -s http://localhost:4003/api/sessions/<id>` returns `{id, projectId, name, role, status:'active', messages:[]}`",
+          "POST with bad shareToken returns 404",
+          "`npm run check` exits 0"
+        ],
+        "output_files": [
+          "apps/api/src/routes/sessions.ts"
+        ]
+      },
+      {
+        "id": "P3-S2",
+        "title": "Interview system prompt and role-adaptive prompt builder",
+        "description": "Create `apps/api/src/services/interview.ts`. Export a function `buildInterviewSystemPrompt(project, session)` that returns a system prompt string. The prompt must: identify the interviewer role as a PRD requirements expert, name the project and include its description and topic, address the stakeholder by name and role, list the 4 PRD areas to cover (Problem+Vision, Users+Personas, Features+Requirements, Tech+Constraints), include role-specific guidance (developer→tech/NFRs, business owner→ROI/metrics, end user→pain points/workflows, product manager→scope/priorities/risks, adapt others by best judgment), and instruct Claude to ask 1-2 focused drilling questions at a time, push for specifics/examples/numbers, and when all areas are covered emit `[INTERVIEW_COMPLETE]` on its own line followed by a structured Markdown summary with one section per PRD area.\nAlso export `extractInterviewCompletion(text: string): { isComplete: boolean; summary: string }` that detects `[INTERVIEW_COMPLETE]` in a response and extracts the summary block after it.",
+        "status": "todo",
+        "acceptance_criteria": [
+          "`buildInterviewSystemPrompt` returns a non-empty string containing the project name, stakeholder name and role, and '[INTERVIEW_COMPLETE]'",
+          "`extractInterviewCompletion('[INTERVIEW_COMPLETE]\\n## Summary\\nHello')` returns `{isComplete:true, summary:'## Summary\\nHello'}`",
+          "`extractInterviewCompletion('Just a normal reply')` returns `{isComplete:false, summary:''}`",
+          "`npm run check` exits 0",
+          "`npm run test` passes (write unit tests for extractInterviewCompletion)"
+        ],
+        "output_files": [
+          "apps/api/src/services/interview.ts",
+          "apps/api/src/services/interview.test.ts"
+        ]
+      },
+      {
+        "id": "P3-S3",
+        "title": "POST /api/sessions/:id/messages — Claude interview",
+        "description": "Create `apps/api/src/services/claude.ts` with an Anthropic SDK client (model: claude-sonnet-4-6). Add `POST /api/sessions/:id/messages` to the sessions router. The handler must:\n1. Load the session and its project from DB\n2. Parse existing messages from session.messages JSON\n3. Append the new user message to the messages array\n4. Call Claude using the Anthropic SDK: system=buildInterviewSystemPrompt(project,session), messages=full history\n5. Append Claude's response to the messages array\n6. Save updated messages to session.messages in DB\n7. Call extractInterviewCompletion on the response text\n8. If complete: set session.status='complete', session.summary=extracted summary, session.completedAt=now(), save, then fire-and-forget prd synthesis (do not await — just call it without blocking the response)\n9. Return `{message:{role:'assistant',content:...}, sessionStatus:'active'|'complete'}`",
+        "status": "todo",
+        "acceptance_criteria": [
+          "POST /api/sessions/:id/messages with `{\"content\":\"I want to build a warehouse app\"}` returns an assistant message",
+          "The session's messages array in DB grows by 2 (user + assistant) after each call",
+          "When Claude returns [INTERVIEW_COMPLETE] in a response, session.status becomes 'complete' in DB",
+          "API returns `{message:{role:'assistant',...}, sessionStatus:'active'}` or `'complete'`",
+          "`npm run check` exits 0"
+        ],
+        "output_files": [
+          "apps/api/src/services/claude.ts",
+          "apps/api/src/routes/sessions.ts"
+        ]
+      },
+      {
+        "id": "P3-S4",
+        "title": "Join session landing page",
+        "description": "Implement `apps/web/src/pages/JoinSession.tsx`. Route: `/join/:shareToken`. On mount: fetch `GET /api/projects/join/:shareToken` — show 404 message if not found. Show project name, description, and a short welcome message. Form: 'Your Name' (text, required) and 'Your Role' (text with datalist suggestions: Developer, Business Owner, End User, Product Manager, Designer, Stakeholder). On submit: POST `/api/sessions` with shareToken+name+role, navigate to `/session/:id` on success.",
+        "status": "todo",
+        "acceptance_criteria": [
+          "Visiting /join/<shareToken> shows the project name and the name/role form",
+          "Visiting /join/bad-token shows a 'Project not found' error",
+          "Submitting the form navigates to /session/:id",
+          "Empty name or role shows validation error before submit",
+          "`npm run check` exits 0"
+        ],
+        "output_files": [
+          "apps/web/src/pages/JoinSession.tsx"
+        ]
+      },
+      {
+        "id": "P3-S5",
+        "title": "Chat session page — interview interface",
+        "description": "Implement `apps/web/src/pages/ChatSession.tsx`. Route: `/session/:sessionId`. On mount: fetch `GET /api/sessions/:id` to restore existing messages. If session.status is 'complete' on mount, redirect immediately to `/session/:id/complete` (or show the completion screen inline). Otherwise show the chat interface: scrollable message list (user messages right-aligned, assistant messages left-aligned with a 'Claude' label), a text input + Send button at the bottom, a typing indicator ('Claude is thinking...') while the API call is in flight. On send: POST `/api/sessions/:id/messages`, append both user + assistant messages to the UI optimistically then update from response. When response returns `sessionStatus:'complete'`: show a thank-you overlay ('Interview complete! Thank you for your contribution. The PRD is being updated.') with a dismiss button.",
+        "status": "todo",
+        "acceptance_criteria": [
+          "Visiting /session/:id shows the chat interface with a welcome message from Claude (auto-triggered on first visit if messages is empty)",
+          "Sending a message shows the typing indicator, then the Claude response appears",
+          "Messages are persisted: refreshing the page reloads existing messages",
+          "When session completes, the thank-you overlay appears",
+          "`npm run check` exits 0"
+        ],
+        "output_files": [
+          "apps/web/src/pages/ChatSession.tsx"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "P4",
+    "name": "Phase 4 — PRD Synthesis & Live Updates",
+    "status": "pending",
+    "stories": [
+      {
+        "id": "P4-S1",
+        "title": "PRD synthesis service — Claude rewrites PRD after each session",
+        "description": "Create `apps/api/src/services/prd-writer.ts`. Export `synthesizePrd(projectId: string): Promise<void>`. This function:\n1. Loads the project + all completed sessions (where status='complete') from DB\n2. Builds a synthesis prompt: current prdMarkdown (or 'No PRD yet') + all session summaries\n3. Calls Claude (claude-sonnet-4-6) with a system prompt instructing it to act as a PRD writer, incorporate the new session insights into the existing PRD, keep all four sections (Problem+Vision, Users+Personas, Features+Requirements, Tech+Constraints) current, and return a JSON object: `{markdown: string, ralphPrd: Phase[]}` where Phase matches the ralph prd.json structure (id, name, status:'todo', stories with id/title/description/status:'todo'/acceptance_criteria)\n4. Parses the JSON from Claude's response (handle if Claude wraps it in markdown code fences)\n5. Updates project.prdMarkdown and project.prdRalphJson (JSON.stringify(ralphPrd)) in DB\n6. This function is called fire-and-forget from the messages route — it must not throw uncaught",
+        "status": "todo",
+        "acceptance_criteria": [
+          "After a session completes (status='complete'), running `synthesizePrd(projectId)` updates project.prdMarkdown to non-empty string in DB",
+          "project.prdRalphJson becomes a valid JSON array of phase objects with stories",
+          "`curl -s http://localhost:4003/api/projects/<id> | jq .prdMarkdown` returns a non-empty PRD after synthesis",
+          "`npm run check` exits 0"
+        ],
+        "output_files": [
+          "apps/api/src/services/prd-writer.ts"
+        ]
+      },
+      {
+        "id": "P4-S2",
+        "title": "Project Dashboard — live PRD preview and session list",
+        "description": "Update `apps/web/src/pages/ProjectDashboard.tsx` and create `apps/web/src/components/PrdPreview.tsx` and `apps/web/src/components/SessionList.tsx`.\n\nSessionList: receives sessions array, renders each with name, role, a status badge (green 'Complete' or yellow 'Active'), and createdAt relative time.\n\nPrdPreview: receives prdMarkdown string, renders it as formatted HTML using react-markdown. Show a placeholder 'PRD will appear here once the first session completes' when markdown is empty.\n\nProjectDashboard polling: if any session has status='active', poll GET /api/projects/:id every 10 seconds to pick up PRD updates. Stop polling when all sessions are complete or the component unmounts.",
+        "status": "todo",
+        "acceptance_criteria": [
+          "Project Dashboard shows sessions list with status badges after sessions are created",
+          "After a session completes and PRD is synthesized, the PRD preview section renders formatted markdown",
+          "Dashboard auto-refreshes every 10s while active sessions exist",
+          "`npm run check` exits 0"
+        ],
+        "output_files": [
+          "apps/web/src/pages/ProjectDashboard.tsx",
+          "apps/web/src/components/PrdPreview.tsx",
+          "apps/web/src/components/SessionList.tsx"
+        ]
+      },
+      {
+        "id": "P4-S3",
+        "title": "Auto-start first Claude message when session begins",
+        "description": "Update `apps/web/src/pages/ChatSession.tsx` to auto-send an empty trigger when `messages.length === 0` on mount. The trigger sends a POST /api/sessions/:id/messages with `{content: '__START__'}`. Update the server-side handler in sessions.ts: if the incoming user content is `'__START__'`, do NOT add a user message to the history — instead just call Claude with only the system prompt and no prior messages, letting Claude open the interview naturally. This ensures the first thing a stakeholder sees is Claude's opening question, not an empty chat.",
+        "status": "todo",
+        "acceptance_criteria": [
+          "Visiting /session/:id for a new session immediately shows a typing indicator, then Claude's opening question",
+          "The opening question is not preceded by a user message bubble",
+          "Refreshing the page with existing messages does NOT re-trigger the auto-start",
+          "`npm run check` exits 0"
+        ],
+        "output_files": [
+          "apps/web/src/pages/ChatSession.tsx",
+          "apps/api/src/routes/sessions.ts"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "P5",
+    "name": "Phase 5 — Export, Polish & Deployment",
+    "status": "pending",
+    "stories": [
+      {
+        "id": "P5-S1",
+        "title": "PRD export routes — Markdown and ralph JSON download",
+        "description": "Create `apps/api/src/routes/export.ts`. Register under `/api/projects/:id/export`.\n- `GET /api/projects/:id/export/markdown`: set Content-Disposition header to `attachment; filename=\"prd-<project.name>.md\"`, Content-Type `text/markdown`, return project.prdMarkdown. Return 404 if project not found, 400 with `{error:'PRD not yet generated'}` if prdMarkdown is empty.\n- `GET /api/projects/:id/export/ralph`: set Content-Disposition to `attachment; filename=\"prd.json\"`, Content-Type `application/json`, return project.prdRalphJson (the raw JSON string). Return 400 if prdRalphJson is '[]' (empty array).\nRegister export router in app.ts.",
+        "status": "todo",
+        "acceptance_criteria": [
+          "`curl -s http://localhost:4003/api/projects/<id>/export/markdown` returns the markdown PRD with correct Content-Disposition header",
+          "`curl -s http://localhost:4003/api/projects/<id>/export/ralph` returns valid JSON with Content-Disposition `attachment; filename=\"prd.json\"`",
+          "Both return 400 when PRD is not yet generated",
+          "`npm run check` exits 0"
+        ],
+        "output_files": [
+          "apps/api/src/routes/export.ts"
+        ]
+      },
+      {
+        "id": "P5-S2",
+        "title": "Export buttons on Project Dashboard",
+        "description": "Update `apps/web/src/pages/ProjectDashboard.tsx`. Add two export buttons in the PRD section (visible only when prdMarkdown is non-empty): 'Download PRD (.md)' and 'Download prd.json (ralph)'. Implement as anchor tags with `download` attribute pointing to the export API routes. Also add a 'Sessions' count summary above the sessions list: 'N sessions — M complete'.",
+        "status": "todo",
+        "acceptance_criteria": [
+          "Export buttons appear when PRD has been generated",
+          "Clicking 'Download PRD (.md)' triggers browser download of a .md file",
+          "Clicking 'Download prd.json (ralph)' triggers browser download of prd.json",
+          "Export buttons are hidden when prdMarkdown is empty",
+          "`npm run check` exits 0"
+        ],
+        "output_files": [
+          "apps/web/src/pages/ProjectDashboard.tsx"
+        ]
+      },
+      {
+        "id": "P5-S3",
+        "title": "CLAUDE.md, railway.toml, and deployment config",
+        "description": "Create `CLAUDE.md` at the repo root documenting: what the project is, tech stack, ports, how to run locally (docker compose + npm commands), the ralph loop instructions, and the Claude integration design (system prompt behavior, [INTERVIEW_COMPLETE] marker, PRD synthesis). Create `railway.toml` with build and start commands for the API service. Create a `Procfile` as fallback. Add `DATABASE_URL` and `ANTHROPIC_API_KEY` to a `railway.env.example` file. The Vite app should use `VITE_API_URL` env var for the API base URL so it can point to Railway in production — update `apps/web/src/lib/api.ts` to use `import.meta.env.VITE_API_URL || ''`.",
+        "status": "todo",
+        "acceptance_criteria": [
+          "CLAUDE.md exists at repo root with project description, ports, and run instructions",
+          "railway.toml exists with valid build/start commands",
+          "apps/web/src/lib/api.ts exports a base URL using VITE_API_URL env var",
+          "`npm run check` exits 0"
+        ],
+        "output_files": [
+          "CLAUDE.md",
+          "railway.toml",
+          "Procfile",
+          "apps/web/src/lib/api.ts"
+        ]
+      },
+      {
+        "id": "P5-S4",
+        "title": "Error handling, loading states, and UI polish",
+        "description": "Add consistent error and loading states across all pages:\n- All fetch calls should handle network errors and show a user-friendly message\n- Loading states: skeleton loaders or spinners on all data-fetching pages\n- Chat input should be disabled while Claude is responding\n- Add a simple navbar/header to Home, NewProject, and ProjectDashboard pages with 'ClaudePRD' branding and a Home link\n- The ChatSession page should auto-scroll to the latest message\n- Add a `lib/api.ts` fetch wrapper that prefixes all requests with the API base URL and throws a typed error on non-2xx responses\n- Make the app mobile-responsive (full-width layouts, readable on phone)\n- Verify all pages look reasonable at 375px width",
+        "status": "todo",
+        "acceptance_criteria": [
+          "Disconnecting the API server and loading any page shows a friendly error message (not a blank page or JS crash)",
+          "All pages show a loading indicator while fetching data",
+          "Chat input is visually disabled (grayed out) while Claude is responding",
+          "Navbar appears on Home, NewProject, and ProjectDashboard",
+          "Chat page auto-scrolls to bottom on new messages",
+          "`npm run check` exits 0"
+        ],
+        "output_files": [
+          "apps/web/src/lib/api.ts",
+          "apps/web/src/components/Navbar.tsx",
+          "apps/web/src/pages/Home.tsx",
+          "apps/web/src/pages/NewProject.tsx",
+          "apps/web/src/pages/ProjectDashboard.tsx",
+          "apps/web/src/pages/ChatSession.tsx"
+        ]
+      }
+    ]
+  }
+]

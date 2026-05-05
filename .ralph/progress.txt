@@ -1,0 +1,12 @@
+------------------------------------------------------------
+[2026-05-05 00:00] SCAFFOLD — repository skeleton created by Claude Code
+STATUS: DONE
+CRITERIA:
+  [PASS] Directory structure created (apps/api, apps/web, packages/contracts, .ralph)
+  [PASS] Git repository initialized
+  [PASS] Package.json workspaces configured
+  [PASS] Prisma schema written (Project + Session models)
+  [PASS] Docker-compose.yml (postgres :5436)
+  [PASS] .ralph/prd.json written with 5 phases, 19 stories
+NOTES: Initial scaffold written by Claude Code planning session. ralph loop ready to run from Phase 1, Story 1.
+------------------------------------------------------------
