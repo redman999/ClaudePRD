@@ -193,18 +193,19 @@
       },
       {
         "id": "P3-S3",
-        "title": "POST /api/sessions/:id/messages — Claude interview",
-        "description": "Create `apps/api/src/services/claude.ts` with an Anthropic SDK client (model: claude-sonnet-4-6). Add `POST /api/sessions/:id/messages` to the sessions router. The handler must:\n1. Load the session and its project from DB\n2. Parse existing messages from session.messages JSON\n3. Append the new user message to the messages array\n4. Call Claude using the Anthropic SDK: system=buildInterviewSystemPrompt(project,session), messages=full history\n5. Append Claude's response to the messages array\n6. Save updated messages to session.messages in DB\n7. Call extractInterviewCompletion on the response text\n8. If complete: set session.status='complete', session.summary=extracted summary, session.completedAt=now(), save, then fire-and-forget prd synthesis (do not await — just call it without blocking the response)\n9. Return `{message:{role:'assistant',content:...}, sessionStatus:'active'|'complete'}`",
+        "title": "POST /api/sessions/:id/messages — multi-provider LLM interview",
+        "description": "Create `apps/api/src/services/llm.ts` — a provider-agnostic LLM service that supports both Anthropic and Ollama (RunPod) at runtime.\n\nProvider selection: read `LLM_PROVIDER` env var (default 'anthropic'). Export:\n```\nexport async function callLlm(system: string, messages: {role:'user'|'assistant', content:string}[]): Promise<string>\n```\n\nFor Anthropic provider: use `@anthropic-ai/sdk`, model `claude-sonnet-4-6`, pass system + messages array.\n\nFor Ollama provider: use native `fetch` (no SDK needed), POST to `${OLLAMA_BASE_URL}/api/chat` with:\n```json\n{\n  \"model\": \"${OLLAMA_MODEL}\",\n  \"stream\": true,\n  \"messages\": [{\"role\":\"system\",\"content\":\"<system>\"}, ...messages],\n  \"options\": {\"num_ctx\": 32768, \"num_predict\": OLLAMA_MAX_TOKENS, \"temperature\": 0.7}\n}\n```\nStream the NDJSON response line by line (each line is `{message:{content:string}, done:boolean}`), accumulate `message.content` chunks into the full response string. Use a reader+decoder loop identical to OOPs llm-call.ts. Throw an error if the fetch fails or the response is non-2xx.\n\nThen add `POST /api/sessions/:id/messages` to the sessions router:\n1. Load session + project from DB\n2. Parse session.messages JSON\n3. If user content is '__START__': skip adding user message, call callLlm with system prompt + empty messages (Claude opens the interview)\n4. Otherwise: append user message, call callLlm with full history\n5. Append assistant response to messages array\n6. Save updated messages to DB\n7. Call extractInterviewCompletion on response\n8. If complete: set status='complete', summary=extracted, completedAt=now(), save, fire-and-forget synthesizePrd (stub that logs 'synthesis triggered' — real impl in P4-S1)\n9. Return `{message:{role:'assistant',content:...}, sessionStatus:'active'|'complete'}`",
         "status": "todo",
         "acceptance_criteria": [
-          "POST /api/sessions/:id/messages with `{\"content\":\"I want to build a warehouse app\"}` returns an assistant message",
-          "The session's messages array in DB grows by 2 (user + assistant) after each call",
-          "When Claude returns [INTERVIEW_COMPLETE] in a response, session.status becomes 'complete' in DB",
+          "With LLM_PROVIDER=anthropic: POST /api/sessions/:id/messages returns an assistant message using Anthropic SDK",
+          "With LLM_PROVIDER=ollama and OLLAMA_BASE_URL set: the same route calls OLLAMA_BASE_URL/api/chat and streams the response",
+          "The session's messages array in DB grows by 2 (user + assistant) after each non-__START__ call",
+          "When the LLM returns [INTERVIEW_COMPLETE] in a response, session.status becomes 'complete' in DB",
           "API returns `{message:{role:'assistant',...}, sessionStatus:'active'}` or `'complete'`",
           "`npm run check` exits 0"
         ],
         "output_files": [
-          "apps/api/src/services/claude.ts",
+          "apps/api/src/services/llm.ts",
           "apps/api/src/routes/sessions.ts"
         ]
       },
@@ -249,8 +250,8 @@
     "stories": [
       {
         "id": "P4-S1",
-        "title": "PRD synthesis service — Claude rewrites PRD after each session",
-        "description": "Create `apps/api/src/services/prd-writer.ts`. Export `synthesizePrd(projectId: string): Promise<void>`. This function:\n1. Loads the project + all completed sessions (where status='complete') from DB\n2. Builds a synthesis prompt: current prdMarkdown (or 'No PRD yet') + all session summaries\n3. Calls Claude (claude-sonnet-4-6) with a system prompt instructing it to act as a PRD writer, incorporate the new session insights into the existing PRD, keep all four sections (Problem+Vision, Users+Personas, Features+Requirements, Tech+Constraints) current, and return a JSON object: `{markdown: string, ralphPrd: Phase[]}` where Phase matches the ralph prd.json structure (id, name, status:'todo', stories with id/title/description/status:'todo'/acceptance_criteria)\n4. Parses the JSON from Claude's response (handle if Claude wraps it in markdown code fences)\n5. Updates project.prdMarkdown and project.prdRalphJson (JSON.stringify(ralphPrd)) in DB\n6. This function is called fire-and-forget from the messages route — it must not throw uncaught",
+        "title": "PRD synthesis service — rewrites PRD after each session (multi-provider)",
+        "description": "Create `apps/api/src/services/prd-writer.ts`. Export `synthesizePrd(projectId: string): Promise<void>`. This function:\n1. Loads the project + all completed sessions (where status='complete') from DB\n2. Builds a synthesis user message: current prdMarkdown (or 'No PRD yet') + all session summaries\n3. Calls `callLlm(system, messages)` from `./llm.ts` — this automatically uses whichever provider is configured (Anthropic or Ollama). System prompt instructs it to act as a PRD writer, incorporate session insights, maintain all four sections (Problem+Vision, Users+Personas, Features+Requirements, Tech+Constraints), and return a JSON object (no prose outside the JSON): `{markdown: string, ralphPrd: Phase[]}` where Phase matches ralph prd.json structure (id, name, status:'todo', stories with id/title/description/status:'todo'/acceptance_criteria)\n4. Parses the JSON from the LLM response — strip markdown code fences if present (```json ... ``` wrapper)\n5. Updates project.prdMarkdown and project.prdRalphJson (JSON.stringify(ralphPrd)) in DB\n6. Wrapped in try/catch — this is called fire-and-forget and must not crash the process",
         "status": "todo",
         "acceptance_criteria": [
           "After a session completes (status='complete'), running `synthesizePrd(projectId)` updates project.prdMarkdown to non-empty string in DB",

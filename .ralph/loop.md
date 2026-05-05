@@ -150,7 +150,18 @@ docker compose up -d postgres
 # 2. API setup
 cd apps/api
 cp .env.example .env
-# Edit .env: add your ANTHROPIC_API_KEY
+# Edit .env — choose ONE provider:
+#
+#   Option A (Anthropic):
+#     LLM_PROVIDER=anthropic
+#     ANTHROPIC_API_KEY=sk-ant-...
+#
+#   Option B (RunPod Ollama):
+#     LLM_PROVIDER=ollama
+#     OLLAMA_BASE_URL=https://your-pod-id-11434.proxy.runpod.net
+#     OLLAMA_MODEL=qwen2.5:72b-instruct-q5_K_M
+#     OLLAMA_MAX_TOKENS=10000
+#
 npm install
 npx prisma migrate dev --name init
 npm run dev   # :4003

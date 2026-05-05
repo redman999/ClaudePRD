@@ -62,10 +62,17 @@ See `.ralph/loop.md` for the full iteration protocol and `.ralph/prd.json` for s
 - Claude signals completion with `[INTERVIEW_COMPLETE]` on its own line, followed by a structured Markdown summary
 - Backend detects this marker and triggers async PRD synthesis
 
+### LLM provider (runtime switch)
+- Controlled by `LLM_PROVIDER` env var: `anthropic` (default) or `ollama`
+- `apps/api/src/services/llm.ts` — single `callLlm(system, messages)` function, routes to the right provider
+- Ollama: streams NDJSON from `OLLAMA_BASE_URL/api/chat` (RunPod proxy URL, no API key needed)
+- Anthropic: uses `@anthropic-ai/sdk` with `claude-sonnet-4-6`
+- Set `LLM_PROVIDER=ollama` + `OLLAMA_BASE_URL` + `OLLAMA_MODEL` in `.env` to use RunPod at runtime
+
 ### PRD synthesis
 - Triggered fire-and-forget after each session completes
-- `apps/api/src/services/prd-writer.ts` calls Claude with current PRD + all session summaries
-- Claude returns `{markdown: string, ralphPrd: Phase[]}` as JSON
+- `apps/api/src/services/prd-writer.ts` calls `callLlm` (whichever provider is active) with current PRD + all session summaries
+- LLM returns `{markdown: string, ralphPrd: Phase[]}` as JSON
 - Stored in `Project.prdMarkdown` and `Project.prdRalphJson`
 - Exported at `GET /api/projects/:id/export/markdown` and `/export/ralph`
 
