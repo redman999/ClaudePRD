@@ -18,3 +18,13 @@ CRITERIA:
   [PASS] node_modules installed in apps/api, apps/web, packages/contracts (hoisted to root via npm workspaces)
 NOTES: Created packages/contracts/tsconfig.json (target ES2020, CommonJS, strict, noEmit). Created apps/api/.eslintrc.json using @typescript-eslint/recommended (parser + plugin already in devDeps). Added minimal stub files apps/api/src/app.ts and apps/web/src/main.tsx (each just `export {}`) to satisfy tsc "no inputs found" error. Added apps/api/vitest.config.ts and apps/web/vitest.config.ts with passWithNoTests:true so npm run test exits 0 before real test files exist. All three workspaces type-check clean.
 ------------------------------------------------------------
+------------------------------------------------------------
+[2026-05-05 20:02] STORY P1-S2 — Start Postgres and run initial Prisma migration
+STATUS: DONE
+CRITERIA:
+  [PASS] `docker compose ps` shows postgres container healthy on port 5436 — claudeprd-postgres-1 Up (healthy) 0.0.0.0:5436->5432/tcp
+  [PASS] `cd apps/api && npx prisma migrate status` shows 1 applied migration (init) — migration 20260505190209_init applied, database in sync
+  [PASS] Project and Session tables exist — verified via `docker exec claudeprd-postgres-1 psql`, both tables present alongside _prisma_migrations
+  [PASS] `@prisma/client` generated — node_modules/.prisma/client exists with index.js, index.d.ts, query_engine-windows.dll.node
+NOTES: Postgres container was already running from prior docker compose up. .env was already present with correct DATABASE_URL (postgresql://claudeprd:claudeprd@localhost:5436/claudeprd). Prisma migration ran cleanly producing migration 20260505190209_init. Prisma Client auto-generated during migration. npm run check and npm run test both pass clean.
+------------------------------------------------------------

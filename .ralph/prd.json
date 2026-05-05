@@ -24,7 +24,9 @@
         "id": "P1-S2",
         "title": "Start Postgres and run initial Prisma migration",
         "description": "Start the Postgres container via `docker compose up -d postgres`. Copy `apps/api/.env.example` to `apps/api/.env`. Run `cd apps/api && npx prisma migrate dev --name init` to create the initial migration and run it. Verify the Project and Session tables exist. Then run `npx prisma generate` to generate the Prisma client.",
-        "status": "todo",
+        "status": "done",
+        "completed": "2026-05-05",
+        "completion_notes": "Postgres container (claudeprd-postgres-1) already running healthy on port 5436. .env already present with DATABASE_URL. Ran `npx prisma migrate dev --name init` — created migration 20260505190209_init with Project and Session tables. Prisma Client generated to node_modules/.prisma/client. Verified tables via docker exec psql. npm run check and npm run test both exit 0.",
         "acceptance_criteria": [
           "`docker compose ps` shows postgres container healthy on port 5436",
           "`cd apps/api && npx prisma migrate status` shows 1 applied migration (init)",
