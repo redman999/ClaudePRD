@@ -1,8 +1,5 @@
 import { Routes, Route } from 'react-router-dom'
-
-function Home() {
-  return <div>Home</div>
-}
+import Home from './pages/Home'
 
 function NewProject() {
   return <div>New Project</div>

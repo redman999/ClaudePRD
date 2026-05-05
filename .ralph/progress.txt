@@ -68,3 +68,13 @@ CRITERIA:
   [PASS] npm run check exits 0 across all workspaces
 NOTES: Created apps/api/src/lib/prisma.ts (PrismaClient singleton). Created apps/api/src/routes/projects.ts with three handlers using CreateProjectSchema from @claudeprd/contracts for Zod validation. Added @claudeprd/contracts workspace dependency to apps/api/package.json. Registered router in app.ts under /api/projects. All routes tested live against running API server.
 ------------------------------------------------------------
+------------------------------------------------------------
+[2026-05-05 12:00] STORY P2-S3 — Home page — project list
+STATUS: DONE
+CRITERIA:
+  [PASS] Navigating to http://localhost:5182/ shows a project list or empty state
+  [PASS] After creating a project via API, refreshing the page shows it in the list (projects returned by GET /api/projects with _count.sessions)
+  [PASS] 'New Project' button navigates to /new (Link to="/new" rendered in header and empty state)
+  [PASS] npm run check in apps/web exits 0
+NOTES: Created apps/web/src/pages/Home.tsx with native fetch, animated loading skeleton (3 placeholder boxes), empty state with New Project link, and project cards showing name, truncated description (80 chars), session count badge, and last updated date. Updated App.tsx to import from pages/Home. Vite proxy at /api forwards to :4003. npm run check and npm run test both exit 0.
+------------------------------------------------------------

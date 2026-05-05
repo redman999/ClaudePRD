@@ -122,7 +122,9 @@
         "id": "P2-S3",
         "title": "Home page — project list",
         "description": "Implement `apps/web/src/pages/Home.tsx`. Fetch `GET /api/projects` on mount (use native fetch, no extra library). Display a list of projects: project name, description (truncated to 80 chars), session count badge, last updated date. Include a prominent 'New Project' button linking to `/new`. Show a loading skeleton while fetching and an empty state ('No projects yet — create your first one') when the list is empty. Use Tailwind for styling.",
-        "status": "todo",
+        "status": "done",
+        "completed": "2026-05-05",
+        "completion_notes": "Created apps/web/src/pages/Home.tsx with useEffect fetch of GET /api/projects, animated loading skeleton (3 gray boxes), empty state message with New Project link, and project list (name, description truncated to 80 chars, session count badge, updated date). Updated App.tsx to import Home from pages/Home. Vite proxy at /api forwards to API on port 4003. npm run check exits 0, npm run test exits 0.",
         "acceptance_criteria": [
           "Navigating to http://localhost:5182/ shows a project list or empty state",
           "After creating a project via API, refreshing the page shows it in the list",
