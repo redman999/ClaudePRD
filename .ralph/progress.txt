@@ -38,3 +38,13 @@ CRITERIA:
   [PASS] `npm run check` exits 0 — tsc + eslint clean (added argsIgnorePattern:^_ for Express error handler 4-arg signature)
 NOTES: Replaced stub app.ts with full Express app: cors (allow all origins), json body parser, morgan dev logging, GET /health route, errorHandler middleware. Created apps/api/src/middleware/error.ts. Fixed eslint no-unused-vars to allow _-prefixed params so Express error handler (err, _req, res, _next) compiles clean. npm run test exits 0 (no test files yet).
 ------------------------------------------------------------
+------------------------------------------------------------
+[2026-05-05 19:30] STORY P1-S4 — Vite + React + Tailwind scaffold with React Router
+STATUS: DONE
+CRITERIA:
+  [PASS] `npm run dev` in apps/web starts on port 5182 without errors
+  [PASS] `curl -s http://localhost:5182` returns HTML with `<div id="root">`
+  [PASS] `npm run check` in apps/web exits 0 (no TS errors)
+  [PASS] Tailwind classes compile: index.css processed by PostCSS (Tailwind + autoprefixer pipeline active, no-class warning is expected for placeholder components)
+NOTES: Created apps/web/src/main.tsx with ReactDOM.createRoot, BrowserRouter, StrictMode. Created App.tsx with 5 placeholder routes (/, /new, /projects/:id, /join/:shareToken, /session/:sessionId). Created index.css with @tailwind directives, tailwind.config.ts with content: ['./index.html', './src/**/*.{ts,tsx}'], and postcss.config.js with tailwindcss + autoprefixer plugins. npm run check exits 0 across all 3 workspaces. npm run test exits 0. Vite dev server serves correct HTML. Phase 1 complete — Phase 2 activated.
+------------------------------------------------------------

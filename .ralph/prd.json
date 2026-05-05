@@ -2,7 +2,7 @@
   {
     "id": "P1",
     "name": "Phase 1 — Foundation",
-    "status": "active",
+    "status": "done",
     "stories": [
       {
         "id": "P1-S1",
@@ -60,7 +60,9 @@
         "id": "P1-S4",
         "title": "Vite + React + Tailwind scaffold with React Router",
         "description": "Create the minimal React app scaffold: `apps/web/src/main.tsx` (ReactDOM.createRoot, BrowserRouter wrapper), `apps/web/src/App.tsx` (React Router Routes with placeholder routes for /, /new, /projects/:id, /join/:shareToken, /session/:sessionId), `apps/web/tailwind.config.ts`, `apps/web/postcss.config.js`, and `apps/web/src/index.css` with Tailwind directives. Each placeholder route can render a simple `<div>Page name</div>`. Verify the dev server starts and shows a page.",
-        "status": "todo",
+        "status": "done",
+        "completed": "2026-05-05",
+        "completion_notes": "Created apps/web/src/main.tsx (ReactDOM.createRoot + BrowserRouter + StrictMode), apps/web/src/App.tsx (5 placeholder routes with react-router-dom Routes/Route), apps/web/src/index.css (@tailwind directives), apps/web/tailwind.config.ts (content: index.html + src/**/*.{ts,tsx}), apps/web/postcss.config.js (tailwindcss + autoprefixer). Vite dev server starts on port 5182, curl returns HTML with <div id=\"root\">, npm run check exits 0, PostCSS/Tailwind pipeline active (Tailwind warning about no utility classes is expected for placeholder components).",
         "acceptance_criteria": [
           "`npm run dev` in apps/web starts on port 5182 without errors",
           "`curl -s http://localhost:5182` returns HTML with `<div id=\"root\">`",
@@ -80,7 +82,7 @@
   {
     "id": "P2",
     "name": "Phase 2 — Project Management",
-    "status": "pending",
+    "status": "active",
     "stories": [
       {
         "id": "P2-S1",
