@@ -28,3 +28,13 @@ CRITERIA:
   [PASS] `@prisma/client` generated — node_modules/.prisma/client exists with index.js, index.d.ts, query_engine-windows.dll.node
 NOTES: Postgres container was already running from prior docker compose up. .env was already present with correct DATABASE_URL (postgresql://claudeprd:claudeprd@localhost:5436/claudeprd). Prisma migration ran cleanly producing migration 20260505190209_init. Prisma Client auto-generated during migration. npm run check and npm run test both pass clean.
 ------------------------------------------------------------
+------------------------------------------------------------
+[2026-05-05 20:05] STORY P1-S3 — Express API skeleton with health check
+STATUS: DONE
+CRITERIA:
+  [PASS] `npm run dev` in apps/api starts without errors — ts-node-dev server up, "API listening on :4003" logged
+  [PASS] `curl -s http://localhost:4003/health` returns {"status":"ok","service":"claudeprd-api","version":"0.1.0"}
+  [PASS] CORS header present — Access-Control-Allow-Origin: * confirmed in response headers
+  [PASS] `npm run check` exits 0 — tsc + eslint clean (added argsIgnorePattern:^_ for Express error handler 4-arg signature)
+NOTES: Replaced stub app.ts with full Express app: cors (allow all origins), json body parser, morgan dev logging, GET /health route, errorHandler middleware. Created apps/api/src/middleware/error.ts. Fixed eslint no-unused-vars to allow _-prefixed params so Express error handler (err, _req, res, _next) compiles clean. npm run test exits 0 (no test files yet).
+------------------------------------------------------------

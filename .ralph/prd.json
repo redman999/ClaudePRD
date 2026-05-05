@@ -42,7 +42,9 @@
         "id": "P1-S3",
         "title": "Express API skeleton with health check",
         "description": "Create `apps/api/src/app.ts` with a minimal Express app: CORS (allow all origins for dev), JSON body parser, morgan logging, a `GET /health` route returning `{status:'ok',service:'claudeprd-api',version:'0.1.0'}`, and a basic error handler middleware. The app should listen on the PORT env var (default 4003). Create `apps/api/src/middleware/error.ts` with the error handler. Start the server and verify the health endpoint responds.",
-        "status": "todo",
+        "status": "done",
+        "completed": "2026-05-05",
+        "completion_notes": "Created apps/api/src/app.ts with Express, cors (allow *), json body parser, morgan, GET /health returning {status:'ok',service:'claudeprd-api',version:'0.1.0'}, and error handler middleware. Created apps/api/src/middleware/error.ts. Added argsIgnorePattern to eslintrc to allow _-prefixed unused params (needed for Express error handler 4-arg signature). npm run check and npm run test both exit 0. curl /health returns correct JSON; CORS header Access-Control-Allow-Origin: * confirmed.",
         "acceptance_criteria": [
           "`npm run dev` in apps/api starts without errors (ts-node-dev)",
           "`curl -s http://localhost:4003/health` returns `{\"status\":\"ok\"}`",
