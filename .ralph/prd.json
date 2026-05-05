@@ -88,7 +88,9 @@
         "id": "P2-S1",
         "title": "POST /api/projects and GET /api/projects/:id routes",
         "description": "Create `apps/api/src/routes/projects.ts` with:\n- `POST /api/projects`: validate body with CreateProjectSchema from contracts, create Project in DB with a cuid shareToken, return `{id, shareToken, ...project}`\n- `GET /api/projects`: return all projects ordered by createdAt desc, each with session count\n- `GET /api/projects/:id`: return full project with sessions array (messages parsed from JSON)\nRegister the router in app.ts under `/api/projects`. Use Zod for input validation — return 400 with `{error, issues}` on validation failure.",
-        "status": "todo",
+        "status": "done",
+        "completed": "2026-05-05",
+        "completion_notes": "Created apps/api/src/lib/prisma.ts (PrismaClient singleton). Created apps/api/src/routes/projects.ts with POST (validates via CreateProjectSchema, returns 400 on failure), GET /api/projects (with _count sessions), GET /api/projects/:id (with sessions, messages parsed from JSON). Added @claudeprd/contracts workspace dependency to API package.json. Registered router in app.ts under /api/projects. All endpoints verified via curl. npm run check exits 0.",
         "acceptance_criteria": [
           "`curl -s -X POST http://localhost:4003/api/projects -H 'Content-Type: application/json' -d '{\"name\":\"Test\",\"description\":\"Desc\",\"topic\":\"Topic\"}' | jq .id` returns a cuid string",
           "`curl -s http://localhost:4003/api/projects` returns JSON array with the created project",

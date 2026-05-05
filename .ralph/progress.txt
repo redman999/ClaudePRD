@@ -48,3 +48,14 @@ CRITERIA:
   [PASS] Tailwind classes compile: index.css processed by PostCSS (Tailwind + autoprefixer pipeline active, no-class warning is expected for placeholder components)
 NOTES: Created apps/web/src/main.tsx with ReactDOM.createRoot, BrowserRouter, StrictMode. Created App.tsx with 5 placeholder routes (/, /new, /projects/:id, /join/:shareToken, /session/:sessionId). Created index.css with @tailwind directives, tailwind.config.ts with content: ['./index.html', './src/**/*.{ts,tsx}'], and postcss.config.js with tailwindcss + autoprefixer plugins. npm run check exits 0 across all 3 workspaces. npm run test exits 0. Vite dev server serves correct HTML. Phase 1 complete — Phase 2 activated.
 ------------------------------------------------------------
+------------------------------------------------------------
+[2026-05-05 19:12] STORY P2-S1 — POST /api/projects and GET /api/projects/:id routes
+STATUS: DONE
+CRITERIA:
+  [PASS] POST /api/projects returns cuid id (e.g. cmot07i010000xuzr860tg853, shareToken present)
+  [PASS] GET /api/projects returns JSON array with created projects (verified 2 entries with _count.sessions)
+  [PASS] GET /api/projects/:id returns project with sessions: [] and messages parsed from JSON
+  [PASS] Missing required field (empty name) returns 400 with {"error":"Validation failed","issues":[...]}
+  [PASS] npm run check exits 0 across all workspaces
+NOTES: Created apps/api/src/lib/prisma.ts (PrismaClient singleton). Created apps/api/src/routes/projects.ts with three handlers using CreateProjectSchema from @claudeprd/contracts for Zod validation. Added @claudeprd/contracts workspace dependency to apps/api/package.json. Registered router in app.ts under /api/projects. All routes tested live against running API server.
+------------------------------------------------------------
