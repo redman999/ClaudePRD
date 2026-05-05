@@ -139,7 +139,9 @@
         "id": "P2-S4",
         "title": "New Project form and creation flow",
         "description": "Implement `apps/web/src/pages/NewProject.tsx`. Form fields: Project Name (required), Description (required, textarea), Topic/Focus Area (required, e.g. 'Enterprise SaaS', 'Mobile App'), Target Audience (optional). On submit: POST to `/api/projects`, then navigate to `/projects/:id` on success. Show inline validation errors before submit. Show a loading spinner during the API call. Handle and display API errors.",
-        "status": "todo",
+        "status": "done",
+        "completed": "2026-05-05",
+        "completion_notes": "Created apps/web/src/pages/NewProject.tsx with controlled form (name, description, topic required; targetAudience optional), client-side validate() function that sets per-field errors without making API call, POST to /api/projects with loading spinner and disabled button, useNavigate redirect to /projects/:id on success, and apiError display on non-2xx response. Updated App.tsx to import real NewProject page instead of inline stub. npm run check and npm run test both exit 0.",
         "acceptance_criteria": [
           "Submitting the form with valid data creates a project and redirects to /projects/:id",
           "Submitting with empty required fields shows validation errors without making an API call",

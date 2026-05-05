@@ -1,9 +1,6 @@
 import { Routes, Route } from 'react-router-dom'
 import Home from './pages/Home'
-
-function NewProject() {
-  return <div>New Project</div>
-}
+import NewProject from './pages/NewProject'
 
 function ProjectDashboard() {
   return <div>Project Dashboard</div>

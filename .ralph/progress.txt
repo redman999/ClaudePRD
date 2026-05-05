@@ -78,3 +78,13 @@ CRITERIA:
   [PASS] npm run check in apps/web exits 0
 NOTES: Created apps/web/src/pages/Home.tsx with native fetch, animated loading skeleton (3 placeholder boxes), empty state with New Project link, and project cards showing name, truncated description (80 chars), session count badge, and last updated date. Updated App.tsx to import from pages/Home. Vite proxy at /api forwards to :4003. npm run check and npm run test both exit 0.
 ------------------------------------------------------------
+------------------------------------------------------------
+[2026-05-05 19:50] STORY P2-S4 — New Project form and creation flow
+STATUS: DONE
+CRITERIA:
+  [PASS] Submitting the form with valid data creates a project and redirects to /projects/:id
+  [PASS] Submitting with empty required fields shows validation errors without making an API call
+  [PASS] The API error message is shown if the POST fails
+  [PASS] npm run check in apps/web exits 0
+NOTES: Created apps/web/src/pages/NewProject.tsx with a controlled React form: three required fields (name, description, topic) and one optional field (targetAudience). Client-side validate() runs on submit before any fetch — sets per-field errors and returns early if any field is missing. On valid submit, POST /api/projects with JSON body; on success, navigate to /projects/:id via useNavigate; on non-2xx, extract the error message and show it above the form. Loading spinner renders inside the submit button and disables the form during the API call. Updated App.tsx to import from pages/NewProject rather than the inline stub. npm run check and npm run test both exit 0.
+------------------------------------------------------------
