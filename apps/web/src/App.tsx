@@ -3,10 +3,7 @@ import Home from './pages/Home'
 import NewProject from './pages/NewProject'
 import ProjectDashboard from './pages/ProjectDashboard'
 import JoinSession from './pages/JoinSession'
-
-function ChatSession() {
-  return <div>Chat Session</div>
-}
+import ChatSession from './pages/ChatSession'
 
 export default function App() {
   return (
