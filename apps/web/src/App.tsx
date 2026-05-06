@@ -2,10 +2,7 @@ import { Routes, Route } from 'react-router-dom'
 import Home from './pages/Home'
 import NewProject from './pages/NewProject'
 import ProjectDashboard from './pages/ProjectDashboard'
-
-function JoinSession() {
-  return <div>Join Session</div>
-}
+import JoinSession from './pages/JoinSession'
 
 function ChatSession() {
   return <div>Chat Session</div>

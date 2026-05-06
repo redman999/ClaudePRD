@@ -132,3 +132,14 @@ CRITERIA:
   [PASS] npm run test exits 0 (12/12 interview tests pass)
 NOTES: Created llm.ts with provider-agnostic callLlm(): Anthropic path uses @anthropic-ai/sdk (claude-sonnet-4-6), Ollama path streams NDJSON via fetch with a while(!streamDone) loop (avoids no-constant-condition lint rule). Created prd-writer.ts stub logging 'synthesis triggered'. Added POST /:id/messages to sessions router: validates with SendMessageSchema, handles __START__ trigger by skipping user message append, calls callLlm with full history, extracts completion marker, updates session status/summary/completedAt if complete, fires synthesizePrd fire-and-forget.
 ------------------------------------------------------------
+------------------------------------------------------------
+[2026-05-06 12:32] STORY P3-S4 — Join session landing page
+STATUS: DONE
+CRITERIA:
+  [PASS] Visiting /join/<shareToken> shows the project name and the name/role form — component fetches GET /api/projects/join/:shareToken and renders project header + form
+  [PASS] Visiting /join/bad-token shows a 'Project not found' error — API returns 404, component sets notFound=true and renders error state
+  [PASS] Submitting the form navigates to /session/:id — on success POST /api/sessions navigates via useNavigate
+  [PASS] Empty name or role shows validation error before submit — validate() guards handleSubmit before any fetch
+  [PASS] npm run check exits 0 — verified, no TS errors across all workspaces
+NOTES: Created apps/web/src/pages/JoinSession.tsx with full join flow: mount-time fetch of project info, loading/not-found/success states, welcome blurb, name+role form with datalist suggestions, client-side validation, and POST /api/sessions on submit. Updated App.tsx to import real JoinSession page instead of inline stub. npm run test passes (12/12 api tests, no web tests).
+------------------------------------------------------------

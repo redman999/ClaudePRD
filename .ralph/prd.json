@@ -236,7 +236,9 @@
         "id": "P3-S4",
         "title": "Join session landing page",
         "description": "Implement `apps/web/src/pages/JoinSession.tsx`. Route: `/join/:shareToken`. On mount: fetch `GET /api/projects/join/:shareToken` — show 404 message if not found. Show project name, description, and a short welcome message. Form: 'Your Name' (text, required) and 'Your Role' (text with datalist suggestions: Developer, Business Owner, End User, Product Manager, Designer, Stakeholder). On submit: POST `/api/sessions` with shareToken+name+role, navigate to `/session/:id` on success.",
-        "status": "todo",
+        "status": "done",
+        "completed": "2026-05-06",
+        "completion_notes": "Created apps/web/src/pages/JoinSession.tsx: fetches GET /api/projects/join/:shareToken on mount, shows loading/not-found states, renders project name+description+topic header, welcome blurb, and a form with Your Name (required text) and Your Role (required text with datalist of 6 role suggestions). On submit POSTs /api/sessions with shareToken+name+role, navigates to /session/:id on success. Per-field validation errors shown before submit. Updated App.tsx to import real JoinSession instead of inline stub. npm run check exits 0, npm run test passes (12/12).",
         "acceptance_criteria": [
           "Visiting /join/<shareToken> shows the project name and the name/role form",
           "Visiting /join/bad-token shows a 'Project not found' error",
