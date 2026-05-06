@@ -121,3 +121,14 @@ CRITERIA:
   [PASS] npm run test passes — 12 unit tests in interview.test.ts all green
 NOTES: Created apps/api/src/services/interview.ts with buildInterviewSystemPrompt (role-specific guidance for 6 known roles with substring-match fallback, four PRD area coverage list, [INTERVIEW_COMPLETE] marker + structured Markdown summary format in prompt) and extractInterviewCompletion (indexOf-based marker detection, trims leading whitespace from summary). Created apps/api/src/services/interview.test.ts with 12 unit tests covering both functions across normal, edge, and mid-response scenarios.
 ------------------------------------------------------------
+------------------------------------------------------------
+[2026-05-06 12:28] STORY P3-S3 — POST /api/sessions/:id/messages — multi-provider LLM interview
+STATUS: DONE
+CRITERIA:
+  [PASS] apps/api/src/services/llm.ts exists and exports callLlm — confirmed with test -f
+  [PASS] POST /api/sessions/:id/messages route exists in sessions.ts — confirmed with grep
+  [SKIP] Live LLM call test — no LLM provider available in CI; test manually with Anthropic API key
+  [PASS] npm run check exits 0 across all workspaces
+  [PASS] npm run test exits 0 (12/12 interview tests pass)
+NOTES: Created llm.ts with provider-agnostic callLlm(): Anthropic path uses @anthropic-ai/sdk (claude-sonnet-4-6), Ollama path streams NDJSON via fetch with a while(!streamDone) loop (avoids no-constant-condition lint rule). Created prd-writer.ts stub logging 'synthesis triggered'. Added POST /:id/messages to sessions router: validates with SendMessageSchema, handles __START__ trigger by skipping user message append, calls callLlm with full history, extracts completion marker, updates session status/summary/completedAt if complete, fires synthesizePrd fire-and-forget.
+------------------------------------------------------------
