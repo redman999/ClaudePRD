@@ -3,6 +3,7 @@ import cors from 'cors';
 import morgan from 'morgan';
 import { errorHandler } from './middleware/error';
 import projectsRouter from './routes/projects';
+import sessionsRouter from './routes/sessions';
 
 const app = express();
 
@@ -15,6 +16,7 @@ app.get('/health', (_req, res) => {
 });
 
 app.use('/api/projects', projectsRouter);
+app.use('/api/sessions', sessionsRouter);
 
 app.use(errorHandler);
 

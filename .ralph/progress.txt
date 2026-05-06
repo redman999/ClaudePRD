@@ -99,3 +99,14 @@ CRITERIA:
   [PASS] npm run check exits 0 — tsc + eslint clean across all workspaces
 NOTES: Created apps/web/src/pages/ProjectDashboard.tsx: reads :id from useParams, fetches project via GET /api/projects/:id, renders loading skeleton, error state, and on success shows project header (name, description, topic), share link section with copy-to-clipboard button, Sessions empty-state card, and PRD empty-state card. Updated App.tsx to import real ProjectDashboard instead of inline stub. Phase 2 complete — Phase 3 now active.
 ------------------------------------------------------------
+
+------------------------------------------------------------
+[2026-05-06 08:55] STORY P3-S1 — POST /api/sessions and GET /api/sessions/:id routes
+STATUS: DONE
+CRITERIA:
+  [PASS] POST /api/sessions with valid shareToken returns a session cuid
+  [PASS] GET /api/sessions/:id returns {id, projectId, name, role, status:'active', messages:[]}
+  [PASS] POST with bad shareToken returns 404 {"error":"Project not found"}
+  [PASS] npm run check exits 0
+NOTES: Created apps/api/src/routes/sessions.ts with POST (CreateSessionSchema validation, project lookup by shareToken, Session creation with messages='[]') and GET /:id (messages parsed JSON→array). Registered router in app.ts under /api/sessions. npm run test exits 0 (no test files yet, passWithNoTests).
+------------------------------------------------------------
