@@ -110,3 +110,14 @@ CRITERIA:
   [PASS] npm run check exits 0
 NOTES: Created apps/api/src/routes/sessions.ts with POST (CreateSessionSchema validation, project lookup by shareToken, Session creation with messages='[]') and GET /:id (messages parsed JSON→array). Registered router in app.ts under /api/sessions. npm run test exits 0 (no test files yet, passWithNoTests).
 ------------------------------------------------------------
+------------------------------------------------------------
+[2026-05-06 12:24] STORY P3-S2 — Interview system prompt and role-adaptive prompt builder
+STATUS: DONE
+CRITERIA:
+  [PASS] buildInterviewSystemPrompt returns non-empty string containing project name, stakeholder name/role, and '[INTERVIEW_COMPLETE]'
+  [PASS] extractInterviewCompletion('[INTERVIEW_COMPLETE]\n## Summary\nHello') returns {isComplete:true, summary:'## Summary\nHello'}
+  [PASS] extractInterviewCompletion('Just a normal reply') returns {isComplete:false, summary:''}
+  [PASS] npm run check exits 0 across all workspaces
+  [PASS] npm run test passes — 12 unit tests in interview.test.ts all green
+NOTES: Created apps/api/src/services/interview.ts with buildInterviewSystemPrompt (role-specific guidance for 6 known roles with substring-match fallback, four PRD area coverage list, [INTERVIEW_COMPLETE] marker + structured Markdown summary format in prompt) and extractInterviewCompletion (indexOf-based marker detection, trims leading whitespace from summary). Created apps/api/src/services/interview.test.ts with 12 unit tests covering both functions across normal, edge, and mid-response scenarios.
+------------------------------------------------------------
