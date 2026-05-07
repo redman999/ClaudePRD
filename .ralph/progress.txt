@@ -154,3 +154,15 @@ CRITERIA:
   [PASS] npm run check exits 0 — tsc + eslint clean across all workspaces
 NOTES: Created apps/web/src/pages/ChatSession.tsx with full chat UI: user messages right-aligned (indigo), assistant left-aligned (white card with C avatar), animated typing indicator, optimistic user message with error rollback, auto-start via __START__ on empty session, completion overlay. Updated App.tsx to import real component. Phase 3 complete; P4 set active.
 ------------------------------------------------------------
+
+------------------------------------------------------------
+[2026-05-06 12:00] STORY P4-S1 — PRD synthesis service — rewrites PRD after each session (multi-provider)
+STATUS: DONE
+CRITERIA:
+  [PASS] apps/api/src/services/prd-writer.ts exists and exports synthesizePrd
+  [PASS] synthesizePrd is called fire-and-forget from messages route (grep confirmed in sessions.ts line 108)
+  [SKIP] Live LLM synthesis test — no LLM provider available; test manually when API key is present
+  [PASS] npm run check exits 0 across all workspaces
+  [PASS] npm run test exits 0
+NOTES: Replaced stub with full synthesizePrd implementation. Loads project + all complete sessions from DB. Builds user message with current prdMarkdown and per-session summaries (name, role, summary). Calls callLlm with a structured system prompt instructing PRD writer role, four-section coverage (Problem+Vision, Users+Personas, Features+Requirements, Tech+Constraints), and JSON-only response format {markdown, ralphPrd}. Strips markdown code fences via stripCodeFences helper before JSON.parse. Updates project.prdMarkdown and project.prdRalphJson in DB. Entire function wrapped in try/catch so fire-and-forget callers cannot crash the process.
+------------------------------------------------------------
