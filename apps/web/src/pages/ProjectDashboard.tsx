@@ -142,7 +142,27 @@ export default function ProjectDashboard() {
             </div>
 
             <div className="bg-white border border-gray-200 rounded-xl p-5">
-              <h2 className="text-base font-semibold text-gray-900 mb-3">PRD</h2>
+              <div className="flex items-center justify-between mb-3">
+                <h2 className="text-base font-semibold text-gray-900">PRD</h2>
+                {project.prdMarkdown && (
+                  <div className="flex items-center gap-2">
+                    <a
+                      href={`/api/projects/${project.id}/export/markdown`}
+                      download
+                      className="text-sm font-medium text-indigo-600 hover:text-indigo-800 border border-indigo-200 hover:border-indigo-400 px-3 py-1.5 rounded-lg transition-colors"
+                    >
+                      Download PRD (.md)
+                    </a>
+                    <a
+                      href={`/api/projects/${project.id}/export/ralph`}
+                      download
+                      className="text-sm font-medium text-indigo-600 hover:text-indigo-800 border border-indigo-200 hover:border-indigo-400 px-3 py-1.5 rounded-lg transition-colors"
+                    >
+                      Download prd.json (ralph)
+                    </a>
+                  </div>
+                )}
+              </div>
               <PrdPreview markdown={project.prdMarkdown ?? ''} />
             </div>
           </div>

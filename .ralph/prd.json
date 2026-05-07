@@ -358,7 +358,9 @@
         "id": "P5-S2",
         "title": "Export buttons on Project Dashboard",
         "description": "Update `apps/web/src/pages/ProjectDashboard.tsx`. Add two export buttons in the PRD section (visible only when prdMarkdown is non-empty): 'Download PRD (.md)' and 'Download prd.json (ralph)'. Implement as anchor tags with `download` attribute pointing to the export API routes. Also add a 'Sessions' count summary above the sessions list: 'N sessions — M complete'.",
-        "status": "todo",
+        "status": "done",
+        "completed": "2026-05-07",
+        "completion_notes": "Added two export anchor tags to ProjectDashboard.tsx PRD section, conditionally rendered only when project.prdMarkdown is non-empty. Both use href pointing to the export API routes (/api/projects/:id/export/markdown and /api/projects/:id/export/ralph) with the download attribute for browser download behavior. Session count summary ('N sessions — M complete') was already implemented in SessionList.tsx (P4-S2). npm run check exits 0, npm run test passes (12/12).",
         "acceptance_criteria": [
           "Export buttons appear when PRD has been generated",
           "Clicking 'Download PRD (.md)' triggers browser download of a .md file",

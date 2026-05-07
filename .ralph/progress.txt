@@ -197,3 +197,14 @@ CRITERIA:
   [PASS] npm run check exits 0 across all workspaces
 NOTES: Created apps/api/src/routes/export.ts with two GET routes using project ID param. Project name sanitized (non-alphanumeric to hyphens, lowercase) for the markdown filename. Router registered in app.ts under /api/projects alongside projectsRouter — no route conflicts since /:id only matches single segment. Live tested against running API: correct headers, correct 400 on empty PRD, correct 404 for unknown project ID. npm run test passes (12/12).
 ------------------------------------------------------------
+------------------------------------------------------------
+[2026-05-07 12:04] STORY P5-S2 — Export buttons on Project Dashboard
+STATUS: DONE
+CRITERIA:
+  [PASS] Export buttons appear when PRD has been generated — conditional render on project.prdMarkdown being non-empty
+  [PASS] Clicking 'Download PRD (.md)' triggers browser download of a .md file — anchor tag with download attr, href /api/projects/:id/export/markdown
+  [PASS] Clicking 'Download prd.json (ralph)' triggers browser download of prd.json — anchor tag with download attr, href /api/projects/:id/export/ralph
+  [PASS] Export buttons are hidden when prdMarkdown is empty — {project.prdMarkdown && (<div>...buttons...</div>)} conditional
+  [PASS] npm run check exits 0 — verified tsc + eslint clean across all 3 workspaces
+NOTES: Updated apps/web/src/pages/ProjectDashboard.tsx to add two anchor export buttons inside the PRD section header. The buttons are wrapped in a conditional block that only renders when project.prdMarkdown is truthy. Session count summary was already implemented in SessionList.tsx during P4-S2. The download attribute on the anchor tags triggers a browser file-save dialog; the filenames come from the Content-Disposition headers set server-side in export.ts.
+------------------------------------------------------------
