@@ -297,7 +297,9 @@
         "id": "P4-S2",
         "title": "Project Dashboard — live PRD preview and session list",
         "description": "Update `apps/web/src/pages/ProjectDashboard.tsx` and create `apps/web/src/components/PrdPreview.tsx` and `apps/web/src/components/SessionList.tsx`.\n\nSessionList: receives sessions array, renders each with name, role, a status badge (green 'Complete' or yellow 'Active'), and createdAt relative time.\n\nPrdPreview: receives prdMarkdown string, renders it as formatted HTML using react-markdown. Show a placeholder 'PRD will appear here once the first session completes' when markdown is empty.\n\nProjectDashboard polling: if any session has status='active', poll GET /api/projects/:id every 10 seconds to pick up PRD updates. Stop polling when all sessions are complete or the component unmounts.",
-        "status": "todo",
+        "status": "done",
+        "completed": "2026-05-07",
+        "completion_notes": "Created apps/web/src/components/SessionList.tsx: renders sessions with name, role, status badge (green Complete / yellow Active), and relative time (relativeTime helper). Shows session count summary 'N sessions — M complete'. Created apps/web/src/components/PrdPreview.tsx: uses react-markdown to render prdMarkdown, shows placeholder when empty. Updated apps/web/src/pages/ProjectDashboard.tsx: uses typed Session interface, integrates SessionList and PrdPreview, polls GET /api/projects/:id every 10s when any session has status='active', stops polling when all complete or component unmounts (useRef for interval handle). npm run check exits 0, npm run test passes (12/12).",
         "acceptance_criteria": [
           "Project Dashboard shows sessions list with status badges after sessions are created",
           "After a session completes and PRD is synthesized, the PRD preview section renders formatted markdown",

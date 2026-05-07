@@ -1,5 +1,15 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
+import SessionList from '../components/SessionList'
+import PrdPreview from '../components/PrdPreview'
+
+interface Session {
+  id: string
+  name: string
+  role: string
+  status: 'active' | 'complete'
+  createdAt: string
+}
 
 interface Project {
   id: string
@@ -7,10 +17,10 @@ interface Project {
   description: string
   topic: string
   shareToken: string
+  prdMarkdown: string | null
   createdAt: string
   updatedAt: string
-  sessions: unknown[]
-  prdMarkdown: string | null
+  sessions: Session[]
 }
 
 function Skeleton() {
@@ -29,17 +39,48 @@ export default function ProjectDashboard() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
-  useEffect(() => {
-    fetch(`/api/projects/${id}`)
+  function fetchProject() {
+    return fetch(`/api/projects/${id}`)
       .then(r => {
         if (!r.ok) throw new Error(r.status === 404 ? 'Project not found' : 'Failed to load project')
         return r.json() as Promise<Project>
       })
-      .then(data => setProject(data))
+      .then(data => {
+        setProject(data)
+        return data
+      })
+  }
+
+  function startPolling(data: Project) {
+    if (intervalRef.current) return
+    const hasActive = data.sessions.some(s => s.status === 'active')
+    if (!hasActive) return
+    intervalRef.current = setInterval(() => {
+      fetchProject().then(updated => {
+        const stillActive = updated.sessions.some(s => s.status === 'active')
+        if (!stillActive && intervalRef.current) {
+          clearInterval(intervalRef.current)
+          intervalRef.current = null
+        }
+      }).catch(() => {/* swallow poll errors */})
+    }, 10000)
+  }
+
+  useEffect(() => {
+    fetchProject()
+      .then(data => startPolling(data))
       .catch(err => setError((err as Error).message))
       .finally(() => setLoading(false))
-  }, [id])
+
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current)
+        intervalRef.current = null
+      }
+    }
+  }, [id]) // eslint-disable-line react-hooks/exhaustive-deps
 
   function handleCopy() {
     if (!project) return
@@ -97,16 +138,12 @@ export default function ProjectDashboard() {
 
             <div className="bg-white border border-gray-200 rounded-xl p-5">
               <h2 className="text-base font-semibold text-gray-900 mb-3">Sessions</h2>
-              <p className="text-sm text-gray-500 italic">
-                No sessions yet — share the link above to invite stakeholders.
-              </p>
+              <SessionList sessions={project.sessions} />
             </div>
 
             <div className="bg-white border border-gray-200 rounded-xl p-5">
               <h2 className="text-base font-semibold text-gray-900 mb-3">PRD</h2>
-              <p className="text-sm text-gray-500 italic">
-                PRD will appear here once sessions complete.
-              </p>
+              <PrdPreview markdown={project.prdMarkdown ?? ''} />
             </div>
           </div>
         )}

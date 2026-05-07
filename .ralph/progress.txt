@@ -166,3 +166,14 @@ CRITERIA:
   [PASS] npm run test exits 0
 NOTES: Replaced stub with full synthesizePrd implementation. Loads project + all complete sessions from DB. Builds user message with current prdMarkdown and per-session summaries (name, role, summary). Calls callLlm with a structured system prompt instructing PRD writer role, four-section coverage (Problem+Vision, Users+Personas, Features+Requirements, Tech+Constraints), and JSON-only response format {markdown, ralphPrd}. Strips markdown code fences via stripCodeFences helper before JSON.parse. Updates project.prdMarkdown and project.prdRalphJson in DB. Entire function wrapped in try/catch so fire-and-forget callers cannot crash the process.
 ------------------------------------------------------------
+
+------------------------------------------------------------
+[2026-05-07 11:57] STORY P4-S2 — Project Dashboard — live PRD preview and session list
+STATUS: DONE
+CRITERIA:
+  [PASS] Project Dashboard shows sessions list with status badges after sessions are created — SessionList component renders name, role, green/yellow badge, relative time
+  [PASS] After a session completes and PRD is synthesized, the PRD preview section renders formatted markdown — PrdPreview uses react-markdown
+  [PASS] Dashboard auto-refreshes every 10s while active sessions exist — useRef interval, cleared on unmount or when no active sessions remain
+  [PASS] npm run check exits 0 — verified clean across all 3 workspaces
+NOTES: Created SessionList.tsx (session rows with status badges and relative time helper, session count summary), PrdPreview.tsx (react-markdown render or placeholder), and updated ProjectDashboard.tsx to use typed Session interface, compose the two components, and poll every 10 seconds while active sessions exist. Polling stops automatically when all sessions are complete or the component unmounts. npm run test passes 12/12.
+------------------------------------------------------------
