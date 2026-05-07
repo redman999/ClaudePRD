@@ -273,7 +273,7 @@
   {
     "id": "P4",
     "name": "Phase 4 — PRD Synthesis & Live Updates",
-    "status": "active",
+    "status": "done",
     "stories": [
       {
         "id": "P4-S1",
@@ -316,7 +316,9 @@
         "id": "P4-S3",
         "title": "Auto-start first Claude message when session begins",
         "description": "Update `apps/web/src/pages/ChatSession.tsx` to auto-send an empty trigger when `messages.length === 0` on mount. The trigger sends a POST /api/sessions/:id/messages with `{content: '__START__'}`. Update the server-side handler in sessions.ts: if the incoming user content is `'__START__'`, do NOT add a user message to the history — instead just call Claude with only the system prompt and no prior messages, letting Claude open the interview naturally. This ensures the first thing a stakeholder sees is Claude's opening question, not an empty chat.",
-        "status": "todo",
+        "status": "done",
+        "completed": "2026-05-07",
+        "completion_notes": "Auto-start logic already fully implemented in ChatSession.tsx (P3-S5) and sessions.ts (P3-S3). ChatSession.tsx uses autoStarted ref guard + messages.length===0 check to fire __START__ on mount; sendMessage skips adding user bubble for __START__. sessions.ts handler skips appending user message to history when content==='__START__'. All acceptance criteria verified by code inspection. npm run check exits 0, npm run test passes (12/12).",
         "acceptance_criteria": [
           "Visiting /session/:id for a new session immediately shows a typing indicator, then Claude's opening question",
           "The opening question is not preceded by a user message bubble",
@@ -333,7 +335,7 @@
   {
     "id": "P5",
     "name": "Phase 5 — Export, Polish & Deployment",
-    "status": "pending",
+    "status": "active",
     "stories": [
       {
         "id": "P5-S1",

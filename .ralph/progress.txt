@@ -177,3 +177,13 @@ CRITERIA:
   [PASS] npm run check exits 0 — verified clean across all 3 workspaces
 NOTES: Created SessionList.tsx (session rows with status badges and relative time helper, session count summary), PrdPreview.tsx (react-markdown render or placeholder), and updated ProjectDashboard.tsx to use typed Session interface, compose the two components, and poll every 10 seconds while active sessions exist. Polling stops automatically when all sessions are complete or the component unmounts. npm run test passes 12/12.
 ------------------------------------------------------------
+------------------------------------------------------------
+[2026-05-07 12:00] STORY P4-S3 — Auto-start first Claude message when session begins
+STATUS: DONE
+CRITERIA:
+  [PASS] Visiting /session/:id for a new session immediately shows a typing indicator, then Claude's opening question — ChatSession.tsx useEffect fires sendMessage('__START__') when messages.length===0, setting sending=true which displays the typing indicator
+  [PASS] The opening question is not preceded by a user message bubble — sendMessage() has `if (content !== '__START__')` guard that skips adding user message to UI state
+  [PASS] Refreshing the page with existing messages does NOT re-trigger the auto-start — autoStarted.current ref + messages.length>0 check both prevent re-triggering after page reload with existing messages
+  [PASS] npm run check exits 0 — all three workspaces pass tsc --noEmit and eslint
+NOTES: Both the frontend (ChatSession.tsx) and backend (sessions.ts) auto-start logic were already correctly implemented during P3-S5 and P3-S3 respectively. ChatSession.tsx uses a useRef(false) guard and a messages.length===0 check to fire __START__ exactly once per new session. The server-side handler skips appending a user message to the DB-persisted history when content==='__START__', so Claude sees only the system prompt and responds naturally with its opening question. Phase 4 is now complete; Phase 5 activated.
+------------------------------------------------------------
