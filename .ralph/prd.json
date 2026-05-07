@@ -376,7 +376,9 @@
         "id": "P5-S3",
         "title": "CLAUDE.md, railway.toml, and deployment config",
         "description": "Create `CLAUDE.md` at the repo root documenting: what the project is, tech stack, ports, how to run locally (docker compose + npm commands), the ralph loop instructions, and the Claude integration design (system prompt behavior, [INTERVIEW_COMPLETE] marker, PRD synthesis). Create `railway.toml` with build and start commands for the API service. Create a `Procfile` as fallback. Add `DATABASE_URL` and `ANTHROPIC_API_KEY` to a `railway.env.example` file. The Vite app should use `VITE_API_URL` env var for the API base URL so it can point to Railway in production — update `apps/web/src/lib/api.ts` to use `import.meta.env.VITE_API_URL || ''`.",
-        "status": "todo",
+        "status": "done",
+        "completed": "2026-05-07",
+        "completion_notes": "CLAUDE.md already existed at repo root with full project description, ports, run instructions, ralph loop details, and Claude integration design. Created railway.toml with nixpacks builder, buildCommand (npm install + prisma generate + api build), startCommand (prisma migrate deploy + node dist/app.js), healthcheck at /health. Created Procfile as fallback with same start command. Created railway.env.example with DATABASE_URL, ANTHROPIC_API_KEY, LLM_PROVIDER, PORT. Created apps/web/src/lib/api.ts exporting API_BASE = import.meta.env.VITE_API_URL || ''. Added apps/web/src/vite-env.d.ts with vite/client triple-slash reference to fix TS2339 on ImportMeta.env. npm run check exits 0, npm run test passes (12/12).",
         "acceptance_criteria": [
           "CLAUDE.md exists at repo root with project description, ports, and run instructions",
           "railway.toml exists with valid build/start commands",
