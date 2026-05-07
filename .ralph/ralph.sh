@@ -10,6 +10,12 @@ for ((i=1; i<=$1; i++)); do
 	echo "--------------------------------"
 	echo "Iteration $i"
 	echo "--------------------------------"
+	# Kill any orphaned dev servers from previous iterations before starting
+	fuser -k 4003/tcp 2>/dev/null || true
+	fuser -k 5182/tcp 2>/dev/null || true
+	pkill -f "ts-node-dev" 2>/dev/null || true
+	pkill -f "vite" 2>/dev/null || true
+	sleep 1
 	result=$(claude --permission-mode bypassPermissions -p "study ./.ralph/prd.json and ./.ralph/loop.md
 
 1. PICK THE NEXT STORY IN STRICT PHASE ORDER. Open .ralph/prd.json. Find the FIRST phase whose status is \"active\". Within that phase, find the FIRST story whose status is \"todo\". That is the story you must work on. Do NOT skip ahead to later stories or later phases, even if they look easier or look like they have no infrastructure dependencies. The PRD ordering reflects integration order — skipping it accumulates untested integration risk.
