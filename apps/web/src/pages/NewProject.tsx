@@ -1,5 +1,7 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
+import Navbar from '../components/Navbar'
+import { apiFetch } from '../lib/api'
 
 interface FormValues {
   name: string
@@ -60,16 +62,11 @@ export default function NewProject() {
       if (values.targetAudience.trim()) {
         body.targetAudience = values.targetAudience.trim()
       }
-      const res = await fetch('/api/projects', {
+      const project = await apiFetch<{ id: string }>('/api/projects', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
       })
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}))
-        throw new Error((data as { error?: string }).error ?? `Server error ${res.status}`)
-      }
-      const project = await res.json() as { id: string }
       navigate(`/projects/${project.id}`)
     } catch (err) {
       setApiError((err as Error).message)
@@ -80,17 +77,12 @@ export default function NewProject() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="max-w-2xl mx-auto px-4 py-10">
-        <div className="flex items-center gap-3 mb-8">
-          <Link to="/" className="text-indigo-600 hover:text-indigo-800 text-sm font-medium">
-            ← ClaudePRD
-          </Link>
-        </div>
-
+      <Navbar />
+      <div className="max-w-2xl mx-auto px-4 py-8">
         <h1 className="text-2xl font-bold text-gray-900 mb-6">New Project</h1>
 
         {apiError && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6 text-sm">
             {apiError}
           </div>
         )}

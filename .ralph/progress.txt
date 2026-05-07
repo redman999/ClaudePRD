@@ -218,3 +218,16 @@ CRITERIA:
   [PASS] npm run check exits 0 — verified after adding vite-env.d.ts to fix ImportMeta.env TS error
 NOTES: CLAUDE.md was already complete from the initial scaffold. Created railway.toml (nixpacks, build + start commands, health check), Procfile (fallback), and railway.env.example (DATABASE_URL, ANTHROPIC_API_KEY, LLM_PROVIDER, PORT). Created apps/web/src/lib/api.ts exporting API_BASE. Had to add apps/web/src/vite-env.d.ts with /// <reference types="vite/client" /> because the web tsconfig didn't include vite/client types, causing TS2339 on import.meta.env. npm run check exits 0, npm run test passes (12/12).
 ------------------------------------------------------------
+
+------------------------------------------------------------
+[2026-05-07 12:11] STORY P5-S4 — Error handling, loading states, and UI polish
+STATUS: DONE
+CRITERIA:
+  [PASS] Disconnecting API shows friendly error — apiFetch wrapper catches TypeError (network down) and throws 'Cannot connect to server. Check your network connection.'; all pages display this via error state
+  [PASS] All pages show loading indicator — Home (3 Skeleton cards), NewProject (always rendered, submit spinner), ProjectDashboard (Skeleton), ChatSession (spinner + 'Loading session...')
+  [PASS] Chat input visually disabled — disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed applied; placeholder changes to 'Claude is thinking...' while sending
+  [PASS] Navbar on Home, NewProject, ProjectDashboard — Navbar.tsx created with ClaudePRD brand + Home link; imported and rendered at top of all 3 pages
+  [PASS] Chat auto-scrolls to bottom — messagesEndRef.current?.scrollIntoView({behavior:'smooth'}) in useEffect triggered on [messages, sending]
+  [PASS] npm run check exits 0 — TypeScript clean across all 3 workspaces
+NOTES: Created apps/web/src/components/Navbar.tsx. Updated api.ts with ApiError + apiFetch<T> typed wrapper. Updated Home, NewProject, ProjectDashboard to use Navbar + apiFetch. Updated ChatSession to use apiFetch and improved network error UI. Phase 5 all stories done — marked P5 status "done". All stories in all phases are now done.
+------------------------------------------------------------

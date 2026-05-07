@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useParams } from 'react-router-dom'
+import { apiFetch } from '../lib/api'
 
 interface Message {
   role: 'user' | 'assistant'
@@ -41,16 +42,14 @@ export default function ChatSession() {
     }
 
     try {
-      const res = await fetch(`/api/sessions/${sessionId}/messages`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ content }),
-      })
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({})) as { error?: string }
-        throw new Error(data.error ?? `Server error ${res.status}`)
-      }
-      const data = await res.json() as { message: Message; sessionStatus: 'active' | 'complete' }
+      const data = await apiFetch<{ message: Message; sessionStatus: 'active' | 'complete' }>(
+        `/api/sessions/${sessionId}/messages`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ content }),
+        }
+      )
       setMessages(prev => [...prev, data.message])
       if (data.sessionStatus === 'complete') {
         setSessionComplete(true)
@@ -67,11 +66,7 @@ export default function ChatSession() {
   }, [sessionId])
 
   useEffect(() => {
-    fetch(`/api/sessions/${sessionId}`)
-      .then(res => {
-        if (!res.ok) throw new Error(`Server error ${res.status}`)
-        return res.json() as Promise<SessionInfo>
-      })
+    apiFetch<SessionInfo>(`/api/sessions/${sessionId}`)
       .then(data => {
         setSession(data)
         setMessages(data.messages)
@@ -100,16 +95,27 @@ export default function ChatSession() {
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-gray-400 text-sm">Loading session…</div>
+        <div className="flex items-center gap-2 text-gray-400 text-sm">
+          <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+          </svg>
+          Loading session…
+        </div>
       </div>
     )
   }
 
   if (loadError) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-xl font-bold text-gray-900 mb-2">Session not found</h1>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+        <div className="text-center max-w-sm">
+          <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg className="w-6 h-6 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01M12 3a9 9 0 100 18A9 9 0 0012 3z" />
+            </svg>
+          </div>
+          <h1 className="text-xl font-bold text-gray-900 mb-2">Unable to load session</h1>
           <p className="text-gray-500 text-sm">{loadError}</p>
         </div>
       </div>
@@ -199,8 +205,8 @@ export default function ChatSession() {
                 value={input}
                 onChange={e => setInput(e.target.value)}
                 disabled={sending}
-                placeholder="Type your response…"
-                className="flex-1 border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:bg-gray-50 disabled:text-gray-400"
+                placeholder={sending ? 'Claude is thinking…' : 'Type your response…'}
+                className="flex-1 border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
               />
               <button
                 type="submit"

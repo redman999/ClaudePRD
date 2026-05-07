@@ -335,7 +335,7 @@
   {
     "id": "P5",
     "name": "Phase 5 — Export, Polish & Deployment",
-    "status": "active",
+    "status": "done",
     "stories": [
       {
         "id": "P5-S1",
@@ -396,7 +396,9 @@
         "id": "P5-S4",
         "title": "Error handling, loading states, and UI polish",
         "description": "Add consistent error and loading states across all pages:\n- All fetch calls should handle network errors and show a user-friendly message\n- Loading states: skeleton loaders or spinners on all data-fetching pages\n- Chat input should be disabled while Claude is responding\n- Add a simple navbar/header to Home, NewProject, and ProjectDashboard pages with 'ClaudePRD' branding and a Home link\n- The ChatSession page should auto-scroll to the latest message\n- Add a `lib/api.ts` fetch wrapper that prefixes all requests with the API base URL and throws a typed error on non-2xx responses\n- Make the app mobile-responsive (full-width layouts, readable on phone)\n- Verify all pages look reasonable at 375px width",
-        "status": "todo",
+        "status": "done",
+        "completed": "2026-05-07",
+        "completion_notes": "Updated apps/web/src/lib/api.ts with ApiError class and apiFetch<T> wrapper: catches network errors (TypeError from fetch()) and throws friendly 'Cannot connect to server' message; catches non-2xx responses and extracts .error from JSON body. Created apps/web/src/components/Navbar.tsx with ClaudePRD brand link to /. Updated Home.tsx: added Navbar, uses apiFetch. Updated NewProject.tsx: added Navbar, removed back-link, uses apiFetch. Updated ProjectDashboard.tsx: added Navbar, removed back-link, uses apiFetch, flex-wrap on share-link row for mobile. Updated ChatSession.tsx: uses apiFetch, improved load error UI (icon + message), input disabled:bg-gray-100 disabled:cursor-not-allowed visual style, placeholder changes to 'Claude is thinking…' while sending. Auto-scroll via scrollIntoView already present. npm run check exits 0, npm run test passes (12/12).",
         "acceptance_criteria": [
           "Disconnecting the API server and loading any page shows a friendly error message (not a blank page or JS crash)",
           "All pages show a loading indicator while fetching data",

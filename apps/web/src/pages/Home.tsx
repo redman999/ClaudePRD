@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import Navbar from '../components/Navbar'
+import { apiFetch } from '../lib/api'
 
 interface ProjectListItem {
   id: string
@@ -34,11 +36,7 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    fetch('/api/projects')
-      .then(r => {
-        if (!r.ok) throw new Error('Failed to load projects')
-        return r.json() as Promise<ProjectListItem[]>
-      })
+    apiFetch<ProjectListItem[]>('/api/projects')
       .then(data => setProjects(data))
       .catch(err => setError((err as Error).message))
       .finally(() => setLoading(false))
@@ -46,19 +44,20 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="max-w-3xl mx-auto px-4 py-10">
+      <Navbar />
+      <div className="max-w-3xl mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-8">
-          <h1 className="text-2xl font-bold text-gray-900">ClaudePRD</h1>
+          <h1 className="text-xl font-semibold text-gray-900">Projects</h1>
           <Link
             to="/new"
-            className="bg-indigo-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-indigo-700 transition-colors"
+            className="bg-indigo-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-indigo-700 transition-colors text-sm"
           >
             New Project
           </Link>
         </div>
 
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6 text-sm">
             {error}
           </div>
         )}
@@ -69,7 +68,7 @@ export default function Home() {
             <Skeleton />
             <Skeleton />
           </div>
-        ) : projects.length === 0 ? (
+        ) : projects.length === 0 && !error ? (
           <div className="text-center py-20 text-gray-500">
             <p className="text-lg">No projects yet — create your first one</p>
             <Link
