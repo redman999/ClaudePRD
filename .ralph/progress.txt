@@ -187,3 +187,13 @@ CRITERIA:
   [PASS] npm run check exits 0 — all three workspaces pass tsc --noEmit and eslint
 NOTES: Both the frontend (ChatSession.tsx) and backend (sessions.ts) auto-start logic were already correctly implemented during P3-S5 and P3-S3 respectively. ChatSession.tsx uses a useRef(false) guard and a messages.length===0 check to fire __START__ exactly once per new session. The server-side handler skips appending a user message to the DB-persisted history when content==='__START__', so Claude sees only the system prompt and responds naturally with its opening question. Phase 4 is now complete; Phase 5 activated.
 ------------------------------------------------------------
+------------------------------------------------------------
+[2026-05-07 12:02] STORY P5-S1 — PRD export routes — Markdown and ralph JSON download
+STATUS: DONE
+CRITERIA:
+  [PASS] GET /api/projects/<id>/export/markdown returns markdown PRD with Content-Disposition: attachment; filename="prd-test-p3s5.md" and Content-Type: text/markdown
+  [PASS] GET /api/projects/<id>/export/ralph returns JSON with Content-Disposition: attachment; filename="prd.json"
+  [PASS] Both return 400 {"error":"PRD not yet generated"} when PRD is empty/[] 
+  [PASS] npm run check exits 0 across all workspaces
+NOTES: Created apps/api/src/routes/export.ts with two GET routes using project ID param. Project name sanitized (non-alphanumeric to hyphens, lowercase) for the markdown filename. Router registered in app.ts under /api/projects alongside projectsRouter — no route conflicts since /:id only matches single segment. Live tested against running API: correct headers, correct 400 on empty PRD, correct 404 for unknown project ID. npm run test passes (12/12).
+------------------------------------------------------------

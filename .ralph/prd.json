@@ -341,7 +341,9 @@
         "id": "P5-S1",
         "title": "PRD export routes — Markdown and ralph JSON download",
         "description": "Create `apps/api/src/routes/export.ts`. Register under `/api/projects/:id/export`.\n- `GET /api/projects/:id/export/markdown`: set Content-Disposition header to `attachment; filename=\"prd-<project.name>.md\"`, Content-Type `text/markdown`, return project.prdMarkdown. Return 404 if project not found, 400 with `{error:'PRD not yet generated'}` if prdMarkdown is empty.\n- `GET /api/projects/:id/export/ralph`: set Content-Disposition to `attachment; filename=\"prd.json\"`, Content-Type `application/json`, return project.prdRalphJson (the raw JSON string). Return 400 if prdRalphJson is '[]' (empty array).\nRegister export router in app.ts.",
-        "status": "todo",
+        "status": "done",
+        "completed": "2026-05-07",
+        "completion_notes": "Created apps/api/src/routes/export.ts with GET /:id/export/markdown (Content-Disposition attachment with sanitized project name, Content-Type text/markdown, 404 if not found, 400 if prdMarkdown empty) and GET /:id/export/ralph (Content-Disposition prd.json, Content-Type application/json, 400 if prdRalphJson is '[]'). Registered export router in app.ts under /api/projects alongside existing projectsRouter. All endpoints verified live: correct headers, 400 when PRD empty, 404 for unknown id. npm run check exits 0, npm run test passes (12/12).",
         "acceptance_criteria": [
           "`curl -s http://localhost:4003/api/projects/<id>/export/markdown` returns the markdown PRD with correct Content-Disposition header",
           "`curl -s http://localhost:4003/api/projects/<id>/export/ralph` returns valid JSON with Content-Disposition `attachment; filename=\"prd.json\"`",
