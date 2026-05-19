@@ -1,8 +1,14 @@
 import { Router, Request, Response } from 'express'
 import { CreateProjectSchema } from '@claudeprd/contracts'
 import prisma from '../lib/prisma'
+import { listTemplates } from '../services/prd-templates'
 
 const router = Router()
+
+// GET /api/projects/templates — must be before /:id
+router.get('/templates', (_req: Request, res: Response) => {
+  return res.json(listTemplates())
+})
 
 // POST /api/projects
 router.post('/', async (req: Request, res: Response) => {
@@ -11,15 +17,58 @@ router.post('/', async (req: Request, res: Response) => {
     return res.status(400).json({ error: 'Validation failed', issues: result.error.issues })
   }
 
-  const { name, description, topic } = result.data
+  const { name, description, topic, template } = result.data
 
   try {
     const project = await prisma.project.create({
-      data: { name, description, topic },
+      data: { name, description, topic, template: template ?? 'standard' },
     })
     return res.status(201).json(project)
   } catch (err) {
     return res.status(500).json({ error: 'Failed to create project' })
+  }
+})
+
+// GET /api/projects/:id/versions
+router.get('/:id/versions', async (req: Request, res: Response) => {
+  try {
+    const versions = await prisma.prdVersion.findMany({
+      where: { projectId: req.params.id },
+      orderBy: { version: 'desc' },
+      select: {
+        id: true,
+        version: true,
+        triggeringSessionId: true,
+        synthesisSkipped: true,
+        skipReason: true,
+        createdAt: true,
+      },
+    })
+    return res.json(versions)
+  } catch (err) {
+    return res.status(500).json({ error: 'Failed to fetch versions' })
+  }
+})
+
+// GET /api/projects/:id/versions/:v
+router.get('/:id/versions/:v', async (req: Request, res: Response) => {
+  const v = parseInt(req.params.v, 10)
+  if (!Number.isFinite(v)) {
+    return res.status(400).json({ error: 'Invalid version number' })
+  }
+  try {
+    const version = await prisma.prdVersion.findUnique({
+      where: { projectId_version: { projectId: req.params.id, version: v } },
+    })
+    if (!version) {
+      return res.status(404).json({ error: 'Version not found' })
+    }
+    return res.json({
+      ...version,
+      ralphPrd: JSON.parse(version.ralphJson) as unknown,
+    })
+  } catch (err) {
+    return res.status(500).json({ error: 'Failed to fetch version' })
   }
 })
 

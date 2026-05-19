@@ -1,10 +1,19 @@
 import { z } from 'zod'
 
+export const PRD_TEMPLATE_NAMES = [
+  'standard',
+  'internal-tool',
+  'b2b-saas',
+  'developer-platform',
+] as const
+export type PrdTemplateName = (typeof PRD_TEMPLATE_NAMES)[number]
+
 export const CreateProjectSchema = z.object({
   name: z.string().min(1),
   description: z.string().min(1),
   topic: z.string().min(1),
   targetAudience: z.string().optional(),
+  template: z.enum(PRD_TEMPLATE_NAMES).optional(),
 })
 
 export const CreateSessionSchema = z.object({

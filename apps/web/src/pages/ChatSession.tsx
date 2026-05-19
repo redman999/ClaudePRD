@@ -7,12 +7,34 @@ interface Message {
   content: string
 }
 
+interface CoverageScores {
+  problemVision: number
+  usersPersonas: number
+  featuresReqs: number
+  techConstraints: number
+}
+
+const AREA_LABELS: { key: keyof CoverageScores; label: string }[] = [
+  { key: 'problemVision', label: 'Problem & Vision' },
+  { key: 'usersPersonas', label: 'Users & Personas' },
+  { key: 'featuresReqs', label: 'Features & Requirements' },
+  { key: 'techConstraints', label: 'Tech & Constraints' },
+]
+
+const EMPTY_COVERAGE: CoverageScores = {
+  problemVision: 0,
+  usersPersonas: 0,
+  featuresReqs: 0,
+  techConstraints: 0,
+}
+
 interface SessionInfo {
   id: string
   name: string
   role: string
   status: 'active' | 'complete'
   messages: Message[]
+  coverage?: CoverageScores
   project: {
     name: string
     description: string
@@ -30,6 +52,7 @@ export default function ChatSession() {
   const [sending, setSending] = useState(false)
   const [sessionComplete, setSessionComplete] = useState(false)
   const [showOverlay, setShowOverlay] = useState(false)
+  const [coverage, setCoverage] = useState<CoverageScores>(EMPTY_COVERAGE)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const autoStarted = useRef(false)
 
@@ -46,15 +69,17 @@ export default function ChatSession() {
     }
 
     try {
-      const data = await apiFetch<{ message: Message; sessionStatus: 'active' | 'complete' }>(
-        `/api/sessions/${sessionId}/messages`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ content }),
-        }
-      )
+      const data = await apiFetch<{
+        message: Message
+        sessionStatus: 'active' | 'complete'
+        coverage?: CoverageScores
+      }>(`/api/sessions/${sessionId}/messages`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content }),
+      })
       setMessages(prev => [...prev, data.message])
+      if (data.coverage) setCoverage(data.coverage)
       if (data.sessionStatus === 'complete') {
         setSessionComplete(true)
         setShowOverlay(true)
@@ -74,6 +99,7 @@ export default function ChatSession() {
       .then(data => {
         setSession(data)
         setMessages(data.messages)
+        if (data.coverage) setCoverage(data.coverage)
         if (data.status === 'complete') setSessionComplete(true)
       })
       .catch(err => setLoadError((err as Error).message))
@@ -148,6 +174,29 @@ export default function ChatSession() {
             </span>
           )}
         </div>
+        {!sessionComplete && (
+          <div className="max-w-2xl mx-auto mt-3 grid grid-cols-2 sm:grid-cols-4 gap-2">
+            {AREA_LABELS.map(({ key, label }) => {
+              const score = coverage[key]
+              const pct = Math.min(100, Math.round((score / 3) * 100))
+              const done = score >= 2
+              return (
+                <div key={key} className="flex flex-col gap-1">
+                  <div className="flex items-center justify-between text-[10px] font-medium tracking-wide">
+                    <span className={done ? 'text-green-700' : 'text-gray-500'}>{label}</span>
+                    {done && <span className="text-green-600">✓</span>}
+                  </div>
+                  <div className="h-1 bg-gray-200 rounded-full overflow-hidden">
+                    <div
+                      className={`h-full rounded-full transition-all ${done ? 'bg-green-500' : 'bg-indigo-400'}`}
+                      style={{ width: `${pct}%` }}
+                    />
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        )}
       </div>
 
       <div className="flex-1 overflow-y-auto px-4 py-6">

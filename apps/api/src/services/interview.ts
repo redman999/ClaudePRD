@@ -10,12 +10,29 @@ interface SessionContext {
 }
 
 const ROLE_GUIDANCE: Record<string, string> = {
-  developer: `Focus on technical requirements, non-functional requirements (NFRs), architecture constraints, scalability, security, integrations, and tech debt. Ask about existing systems, APIs, data models, and deployment environment.`,
-  'business owner': `Focus on business goals, ROI, success metrics, revenue impact, competitive landscape, budget constraints, and timelines. Ask for concrete numbers and target outcomes.`,
-  'end user': `Focus on daily workflows, pain points, usability requirements, accessibility, and what a successful experience looks like. Ask for real examples from their day-to-day.`,
-  'product manager': `Focus on scope boundaries, prioritization, risks, dependencies, launch criteria, and rollout plan. Ask what is explicitly out of scope and what the MVP looks like.`,
-  designer: `Focus on UX requirements, user journeys, accessibility needs, brand constraints, and responsive/platform targets. Ask about edge cases and error states.`,
-  stakeholder: `Focus on high-level goals, success criteria, organizational constraints, and key concerns. Ask what a failed delivery would look like and what must not be compromised.`,
+  developer: `Focus on technical requirements, non-functional requirements (NFRs), architecture constraints, scalability, security, integrations, and tech debt. Ask about existing systems, APIs, data models, and deployment environment.
+
+**Switching-moment drilling:** When the interviewee mentions a workaround, manual step, or current pain ("we work around X by..."), pause and ask them to walk through the **last specific time** it happened — what triggered it, what they did, what broke. Real incidents reveal real requirements; abstract pain reveals abstract requirements.`,
+
+  'business owner': `Focus on business goals, ROI, success metrics, revenue impact, competitive landscape, budget constraints, and timelines. Ask for concrete numbers and target outcomes.
+
+**Switching-moment drilling:** When the interviewee cites an ROI hope or strategic goal, anchor it to today: "Compared to what you're doing right now, what does success look like in dollars or hours saved in 12 months?" If they hesitate on numbers, ask what would have to be true 12 months from now for them to call the project a win.`,
+
+  'end user': `Focus on daily workflows, pain points, usability requirements, accessibility, and what a successful experience looks like. Ask for real examples from their day-to-day.
+
+**Switching-moment drilling:** When the interviewee describes a frustration, ask "tell me about the **last time** you tried to do this — what did you actually do, and what made you stop or switch to something else?" Don't accept "it's slow" or "it's confusing" — get to the specific event.`,
+
+  'product manager': `Focus on scope boundaries, prioritization, risks, dependencies, launch criteria, and rollout plan. Ask what is explicitly out of scope and what the MVP looks like.
+
+**Switching-moment drilling:** When the interviewee proposes a feature, ask "what would have to be untrue for you to cut this from v1?" When they describe a risk, ask "tell me about the last project where something like this bit you — what did you wish you'd known earlier?"`,
+
+  designer: `Focus on UX requirements, user journeys, accessibility needs, brand constraints, and responsive/platform targets. Ask about edge cases and error states.
+
+**Switching-moment drilling:** When the interviewee describes a flow, ask them to walk through the **last specific user** who got stuck on it — what was the user trying to do, where did they fail, what did the designer do about it. Concrete user stories reveal real edge cases.`,
+
+  stakeholder: `Focus on high-level goals, success criteria, organizational constraints, and key concerns. Ask what a failed delivery would look like and what must not be compromised.
+
+**Switching-moment drilling:** When the interviewee names a concern, ask "tell me about a past project where this concern materialised — what happened, and what changed afterwards?" Past incidents are the most reliable predictor of what must not be compromised this time.`,
 }
 
 function getRoleGuidance(role: string): string {

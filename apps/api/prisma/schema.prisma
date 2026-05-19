@@ -8,27 +8,48 @@ datasource db {
 }
 
 model Project {
-  id           String    @id @default(cuid())
+  id           String       @id @default(cuid())
   name         String
   description  String
   topic        String
-  shareToken   String    @unique @default(cuid())
-  prdMarkdown  String    @default("")
-  prdRalphJson String    @default("[]")
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
+  template     String       @default("standard")
+  shareToken   String       @unique @default(cuid())
+  prdMarkdown  String       @default("")
+  prdRalphJson String       @default("[]")
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
   sessions     Session[]
+  versions     PrdVersion[]
 }
 
 model Session {
-  id          String    @id @default(cuid())
-  projectId   String
-  project     Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  name        String
-  role        String
-  status      String    @default("active")
-  messages    String    @default("[]")
-  summary     String    @default("")
-  createdAt   DateTime  @default(now())
-  completedAt DateTime?
+  id           String       @id @default(cuid())
+  projectId    String
+  project      Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  name         String
+  role         String
+  status       String       @default("active")
+  messages     String       @default("[]")
+  summary      String       @default("")
+  coveredAreas Json         @default("{}")
+  createdAt    DateTime     @default(now())
+  completedAt  DateTime?
+  versions     PrdVersion[]
+}
+
+model PrdVersion {
+  id                  String   @id @default(cuid())
+  projectId           String
+  project             Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  version             Int
+  markdown            String
+  ralphJson           String
+  triggeringSessionId String?
+  triggeringSession   Session? @relation(fields: [triggeringSessionId], references: [id], onDelete: SetNull)
+  synthesisSkipped    Boolean  @default(false)
+  skipReason          String?
+  createdAt           DateTime @default(now())
+
+  @@unique([projectId, version])
+  @@index([projectId, createdAt])
 }

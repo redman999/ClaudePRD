@@ -5,6 +5,13 @@ import { buildInterviewSystemPrompt } from '../services/interview'
 import { callLlm } from '../services/llm'
 import { extractInterviewCompletion } from '../services/interview'
 import { synthesizePrd } from '../services/prd-writer'
+import {
+  scoreExchange,
+  mergeCoverage,
+  isCoverageSufficient,
+  uncoveredAreas,
+  normalizeCoverage,
+} from '../services/coverage'
 
 const router = Router()
 
@@ -58,9 +65,12 @@ router.get('/:id', async (req: Request, res: Response) => {
       return res.status(404).json({ error: 'Session not found' })
     }
 
+    const coverage = normalizeCoverage(session.coveredAreas)
     return res.json({
       ...session,
       messages: JSON.parse(session.messages) as unknown[],
+      coverage,
+      uncoveredAreas: uncoveredAreas(coverage),
       project: {
         name: session.project.name,
         description: session.project.description,
@@ -103,38 +113,56 @@ router.post('/:id/messages', async (req: Request, res: Response) => {
     const userMessageCount = messages.filter(m => m.role === 'user').length
     const { isComplete, summary } = extractInterviewCompletion(rawText)
 
-    const tooEarly = isComplete && userMessageCount < 5
-    const assistantText = tooEarly
+    const latestUserMessage = messages[messages.length - 1]?.content ?? ''
+    const cleanAssistantText = isComplete
       ? rawText.slice(0, rawText.indexOf('[INTERVIEW_COMPLETE]')).trim()
       : rawText
 
+    const exchangeScores = await scoreExchange(latestUserMessage, cleanAssistantText)
+    const prevCoverage = normalizeCoverage(session.coveredAreas)
+    const newCoverage = mergeCoverage(prevCoverage, exchangeScores)
+
+    const tooEarly = isComplete && userMessageCount < 5
+    const coverageFallback = userMessageCount >= 8
+    const coverageInsufficient =
+      isComplete && !coverageFallback && !isCoverageSufficient(newCoverage)
+    const stripMarker = tooEarly || coverageInsufficient
+    const assistantText = stripMarker ? cleanAssistantText : rawText
+
     messages.push({ role: 'assistant', content: assistantText })
 
-    if (isComplete && !tooEarly) {
+    if (isComplete && !tooEarly && !coverageInsufficient) {
       await prisma.session.update({
         where: { id: session.id },
         data: {
           messages: JSON.stringify(messages),
           status: 'complete',
           summary,
+          coveredAreas: newCoverage as object,
           completedAt: new Date(),
         },
       })
-      synthesizePrd(session.projectId).catch(console.error)
+      synthesizePrd(session.projectId, session.id).catch(console.error)
       return res.json({
         message: { role: 'assistant', content: assistantText },
         sessionStatus: 'complete',
+        coverage: newCoverage,
       })
     }
 
     await prisma.session.update({
       where: { id: session.id },
-      data: { messages: JSON.stringify(messages) },
+      data: {
+        messages: JSON.stringify(messages),
+        coveredAreas: newCoverage as object,
+      },
     })
 
     return res.json({
       message: { role: 'assistant', content: assistantText },
       sessionStatus: 'active',
+      coverage: newCoverage,
+      uncoveredAreas: uncoveredAreas(newCoverage),
     })
   } catch (err) {
     console.error(err)
