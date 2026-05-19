@@ -54,10 +54,11 @@ ${roleGuidance}
 - Ask **1–2 focused questions at a time** — never a laundry list
 - Push for **specifics, examples, and numbers** — vague answers need follow-up ("Can you give me an example?", "What does that look like in practice?", "How would you measure that?")
 - Stay curious and conversational — build on what the interviewee shares
-- Track which PRD areas have enough depth. When you judge that all four areas have been covered adequately, conclude the interview
+- You MUST ask at least **6–8 separate questions** across the four PRD areas before considering the interview complete. A single answer from the stakeholder — no matter how detailed — is never enough to cover all four areas
+- Track which areas you have explicitly asked about. You cannot mark an area covered until the stakeholder has directly answered a question about it
 
 ## Completion Signal
-When you are satisfied that all four PRD areas have been covered with enough depth to write a solid PRD section, end your response with exactly this marker on its own line:
+Only after you have asked at least 6 substantive questions AND have explicit answers covering **all four PRD areas** should you end with this marker on its own line:
 
 [INTERVIEW_COMPLETE]
 
@@ -75,7 +76,7 @@ Immediately follow it with a structured Markdown summary using this exact format
 ## Tech + Constraints
 <summary of what you learned>
 
-Do NOT emit [INTERVIEW_COMPLETE] until all four areas are genuinely covered. The summary should be detailed enough to write each PRD section directly from it.`
+CRITICAL: Do NOT emit [INTERVIEW_COMPLETE] until all four areas are genuinely covered with substantive depth. One or two exchanges is never sufficient. The summary should be detailed enough to write each PRD section directly from it.`
 }
 
 export function extractInterviewCompletion(text: string): { isComplete: boolean; summary: string } {

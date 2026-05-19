@@ -13,6 +13,10 @@ interface SessionInfo {
   role: string
   status: 'active' | 'complete'
   messages: Message[]
+  project: {
+    name: string
+    description: string
+  }
 }
 
 export default function ChatSession() {
@@ -125,11 +129,17 @@ export default function ChatSession() {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <div className="bg-white border-b border-gray-200 px-4 py-3 flex-shrink-0">
-        <div className="max-w-2xl mx-auto flex items-center justify-between">
+        <div className="max-w-2xl mx-auto flex items-start justify-between">
           <div>
             <p className="text-xs font-semibold text-indigo-600 uppercase tracking-wide">ClaudePRD Interview</p>
             {session && (
               <p className="text-sm text-gray-600">{session.name} · {session.role}</p>
+            )}
+            {session && (
+              <div className="mt-1.5">
+                <p className="text-sm font-semibold text-gray-900">{session.project.name}</p>
+                <p className="text-xs text-gray-500 mt-0.5">{session.project.description}</p>
+              </div>
             )}
           </div>
           {sessionComplete && (

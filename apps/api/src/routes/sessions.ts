@@ -50,7 +50,10 @@ router.post('/', async (req: Request, res: Response) => {
 // GET /api/sessions/:id
 router.get('/:id', async (req: Request, res: Response) => {
   try {
-    const session = await prisma.session.findUnique({ where: { id: req.params.id } })
+    const session = await prisma.session.findUnique({
+      where: { id: req.params.id },
+      include: { project: true },
+    })
     if (!session) {
       return res.status(404).json({ error: 'Session not found' })
     }
@@ -58,6 +61,10 @@ router.get('/:id', async (req: Request, res: Response) => {
     return res.json({
       ...session,
       messages: JSON.parse(session.messages) as unknown[],
+      project: {
+        name: session.project.name,
+        description: session.project.description,
+      },
     })
   } catch (err) {
     return res.status(500).json({ error: 'Failed to fetch session' })
@@ -86,16 +93,24 @@ router.post('/:id/messages', async (req: Request, res: Response) => {
     const messages: Message[] = JSON.parse(session.messages)
     const systemPrompt = buildInterviewSystemPrompt(session.project, session)
 
-    if (content !== '__START__') {
+    if (content === '__START__') {
+      messages.push({ role: 'user', content: 'Hi, I\'m ready to begin.' })
+    } else {
       messages.push({ role: 'user', content })
     }
 
-    const assistantText = await callLlm(systemPrompt, messages)
+    const rawText = await callLlm(systemPrompt, messages)
+    const userMessageCount = messages.filter(m => m.role === 'user').length
+    const { isComplete, summary } = extractInterviewCompletion(rawText)
+
+    const tooEarly = isComplete && userMessageCount < 5
+    const assistantText = tooEarly
+      ? rawText.slice(0, rawText.indexOf('[INTERVIEW_COMPLETE]')).trim()
+      : rawText
+
     messages.push({ role: 'assistant', content: assistantText })
 
-    const { isComplete, summary } = extractInterviewCompletion(assistantText)
-
-    if (isComplete) {
+    if (isComplete && !tooEarly) {
       await prisma.session.update({
         where: { id: session.id },
         data: {
