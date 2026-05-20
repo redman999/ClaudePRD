@@ -32,6 +32,8 @@ function buildSynthesisSystem(template: PrdTemplate): string {
 
   return `You are a senior product manager writing a Product Requirements Document (PRD) by synthesising one or more stakeholder interview summaries.
 
+**Language: Respond exclusively in English. Never use any other language, even for a single word — no Chinese characters, no transliterations, no mixed-language sentences.**
+
 ## PRD template: "${template.name}"
 
 The PRD body must cover exactly these sections, in order:

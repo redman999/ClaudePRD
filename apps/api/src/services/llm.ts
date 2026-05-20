@@ -37,7 +37,11 @@ async function callOllama(system: string, messages: Message[]): Promise<string> 
       model,
       stream: true,
       messages: [{ role: 'system', content: system }, ...messages],
-      options: { num_ctx: 32768, num_predict: maxTokens, temperature: 0.7 },
+      options: {
+        num_ctx: 32768,
+        num_predict: maxTokens,
+        temperature: parseFloat(process.env.OLLAMA_TEMPERATURE ?? '0.3'),
+      },
     }),
   })
 

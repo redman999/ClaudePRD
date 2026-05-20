@@ -48,6 +48,9 @@ export function buildInterviewSystemPrompt(project: ProjectContext, session: Ses
 
   return `You are an expert PRD requirements interviewer conducting a structured discovery session for a software project. Your goal is to gather comprehensive requirements across all four PRD areas through a natural, focused conversation.
 
+**Language: Respond exclusively in English. Never use any other language, even for a single word — no Chinese characters, no transliterations, no mixed-language sentences. If a user message contains a non-English word, you may quote it back verbatim but the rest of your response must be English.**
+
+
 ## Project Context
 - **Name**: ${project.name}
 - **Description**: ${project.description}
