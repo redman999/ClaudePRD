@@ -69,11 +69,22 @@ export default function JoinSession() {
     }
     setSubmitting(true)
     setApiError(null)
+    const trimmedName = name.trim()
+    const trimmedRole = role.trim()
     try {
+      // First check whether this person already has an active session and resume it.
+      const lookupUrl = `/api/sessions/lookup?shareToken=${encodeURIComponent(shareToken ?? '')}&name=${encodeURIComponent(trimmedName)}&role=${encodeURIComponent(trimmedRole)}`
+      const lookup = await fetch(lookupUrl)
+      if (lookup.ok) {
+        const existing = await lookup.json() as { id: string }
+        navigate(`/session/${existing.id}`)
+        return
+      }
+      // No existing active session — create a new one.
       const res = await fetch('/api/sessions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ shareToken, name: name.trim(), role: role.trim() }),
+        body: JSON.stringify({ shareToken, name: trimmedName, role: trimmedRole }),
       })
       if (!res.ok) {
         const data = await res.json().catch(() => ({}))

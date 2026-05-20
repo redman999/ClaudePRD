@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { apiFetch } from '../lib/api'
 
 interface Message {
@@ -38,11 +38,13 @@ interface SessionInfo {
   project: {
     name: string
     description: string
+    shareToken: string
   }
 }
 
 export default function ChatSession() {
   const { sessionId } = useParams<{ sessionId: string }>()
+  const navigate = useNavigate()
   const [session, setSession] = useState<SessionInfo | null>(null)
   const [messages, setMessages] = useState<Message[]>([])
   const [loading, setLoading] = useState(true)
@@ -168,11 +170,34 @@ export default function ChatSession() {
               </div>
             )}
           </div>
-          {sessionComplete && (
-            <span className="inline-flex items-center text-xs bg-green-100 text-green-700 px-2.5 py-1 rounded-full font-medium">
-              Complete
-            </span>
-          )}
+          <div className="flex items-center gap-3">
+            {sessionComplete ? (
+              <span className="inline-flex items-center text-xs bg-green-100 text-green-700 px-2.5 py-1 rounded-full font-medium">
+                Complete
+              </span>
+            ) : (
+              session && (
+                <button
+                  type="button"
+                  onClick={async () => {
+                    const ok = window.confirm(
+                      'Discard this interview and start over? Your answers so far will be deleted.'
+                    )
+                    if (!ok) return
+                    try {
+                      await apiFetch(`/api/sessions/${session.id}`, { method: 'DELETE' })
+                      navigate(`/join/${session.project.shareToken}`)
+                    } catch (err) {
+                      setSendError((err as Error).message)
+                    }
+                  }}
+                  className="text-xs text-gray-500 hover:text-red-600 underline underline-offset-2"
+                >
+                  Discard & start over
+                </button>
+              )
+            )}
+          </div>
         </div>
         {!sessionComplete && (
           <div className="max-w-2xl mx-auto mt-3 grid grid-cols-2 sm:grid-cols-4 gap-2">

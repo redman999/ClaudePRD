@@ -54,6 +54,40 @@ router.post('/', async (req: Request, res: Response) => {
   }
 })
 
+// GET /api/sessions/lookup?shareToken=X&name=Y&role=Z
+// Used by the join page to detect "you already have an active session" — must
+// come before /:id so the param doesn't swallow it.
+router.get('/lookup', async (req: Request, res: Response) => {
+  const shareToken = typeof req.query.shareToken === 'string' ? req.query.shareToken : ''
+  const name = typeof req.query.name === 'string' ? req.query.name.trim() : ''
+  const role = typeof req.query.role === 'string' ? req.query.role.trim() : ''
+  if (!shareToken || !name || !role) {
+    return res.status(400).json({ error: 'shareToken, name, role are all required' })
+  }
+  try {
+    const project = await prisma.project.findUnique({ where: { shareToken } })
+    if (!project) {
+      return res.status(404).json({ error: 'Project not found' })
+    }
+    const active = await prisma.session.findFirst({
+      where: {
+        projectId: project.id,
+        name: { equals: name, mode: 'insensitive' },
+        role: { equals: role, mode: 'insensitive' },
+        status: 'active',
+      },
+      orderBy: { createdAt: 'desc' },
+      select: { id: true, name: true, role: true, status: true, createdAt: true },
+    })
+    if (!active) {
+      return res.status(404).json({ error: 'No active session for this name+role' })
+    }
+    return res.json(active)
+  } catch (err) {
+    return res.status(500).json({ error: 'Lookup failed' })
+  }
+})
+
 // GET /api/sessions/:id
 router.get('/:id', async (req: Request, res: Response) => {
   try {
@@ -74,10 +108,32 @@ router.get('/:id', async (req: Request, res: Response) => {
       project: {
         name: session.project.name,
         description: session.project.description,
+        shareToken: session.project.shareToken,
       },
     })
   } catch (err) {
     return res.status(500).json({ error: 'Failed to fetch session' })
+  }
+})
+
+// DELETE /api/sessions/:id — discard a partial/incorrect interview. Only
+// active sessions can be deleted; completed ones have already fed the PRD
+// version history and removing them would create inconsistency.
+router.delete('/:id', async (req: Request, res: Response) => {
+  try {
+    const session = await prisma.session.findUnique({ where: { id: req.params.id } })
+    if (!session) {
+      return res.status(404).json({ error: 'Session not found' })
+    }
+    if (session.status === 'complete') {
+      return res.status(409).json({
+        error: 'Completed sessions cannot be deleted — they are part of the PRD history',
+      })
+    }
+    await prisma.session.delete({ where: { id: session.id } })
+    return res.status(204).end()
+  } catch (err) {
+    return res.status(500).json({ error: 'Failed to delete session' })
   }
 })
 

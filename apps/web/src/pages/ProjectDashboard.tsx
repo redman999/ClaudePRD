@@ -131,7 +131,17 @@ export default function ProjectDashboard() {
 
             <div className="bg-white border border-gray-200 rounded-xl p-5">
               <h2 className="text-base font-semibold text-gray-900 mb-3">Sessions</h2>
-              <SessionList sessions={project.sessions} />
+              <SessionList
+                sessions={project.sessions}
+                onDelete={async (sessionId) => {
+                  try {
+                    await apiFetch(`/api/sessions/${sessionId}`, { method: 'DELETE' })
+                    await fetchProject()
+                  } catch (err) {
+                    alert(`Couldn't discard session: ${(err as Error).message}`)
+                  }
+                }}
+              />
             </div>
 
             <div className="bg-white border border-gray-200 rounded-xl p-5">
