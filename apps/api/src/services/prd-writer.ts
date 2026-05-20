@@ -30,7 +30,7 @@ function buildSynthesisSystem(template: PrdTemplate): string {
 
   const sectionTitles = template.sections.map((s) => s.title).join(', ')
 
-  return `You are a senior product manager writing a Product Requirements Document (PRD) by synthesising one or more stakeholder interview summaries.
+  return `You are a senior product manager writing a Product Requirements Document (PRD) by synthesising one or more stakeholder interview transcripts.
 
 **Language: Respond exclusively in English. Never use any other language, even for a single word — no Chinese characters, no transliterations, no mixed-language sentences.**
 
@@ -46,7 +46,18 @@ After those sections, append a final mandatory section titled **Open Questions &
 
 If there are no conflicts, write "No unresolved trade-offs surfaced yet." in that section — never omit the header.
 
-## Attribution rules (CRITICAL — this is what makes this PRD different from a generic AI summary)
+## Faithfulness rules (CRITICAL — this is what makes the PRD useful)
+
+You are working from real transcripts. Treat the stakeholders' actual words as ground truth. Do NOT generalise or smooth:
+
+- **Copy named systems verbatim.** If a stakeholder said "Manhattan WMS", write "Manhattan WMS" — not "the WMS", not "their warehouse system".
+- **Copy numbers verbatim.** "p95 under 300ms at 50 concurrent" must appear as "p95 under 300ms at 50 concurrent" — not "low latency", not "fast response".
+- **Copy product names, version numbers, vendor names, file formats, ports, percentages, deadlines, dollar amounts, head-counts.** All of these must appear in the PRD with the exact value the stakeholder gave.
+- **Copy specific incidents.** If a stakeholder described "Maria lost 18 minutes last Tuesday on one SKU because the secondary location was 3 aisles away", that example belongs in the PRD's Users section, with the specifics intact.
+- **Do not invent.** If the transcripts don't cover something, leave it out. Do not fill in best-guess roles, integrations, deadlines, or personas that were never mentioned.
+- **Do not paraphrase.** A short verbatim quote is better than a polished summary.
+
+## Attribution rules
 
 For every non-trivial claim in the body, append inline attribution in square brackets using the stakeholder's display name and role: \`[Alice/PM]\`, \`[Bob/Engineer, Carol/Designer]\`.
 
@@ -93,7 +104,7 @@ export async function synthesizePrd(
       include: {
         sessions: {
           where: { status: 'complete' },
-          select: { id: true, name: true, role: true, summary: true },
+          select: { id: true, name: true, role: true, summary: true, messages: true },
         },
       },
     })
@@ -139,9 +150,9 @@ export async function synthesizePrd(
     }
 
     const currentPrd = latestVersion?.markdown ?? project.prdMarkdown ?? 'No PRD yet'
-    const summaries = project.sessions
-      .map((s) => `### ${s.name} (${s.role})\n${s.summary}`)
-      .join('\n\n')
+    const transcripts = project.sessions
+      .map((s) => renderTranscript(s))
+      .join('\n\n---\n\n')
 
     const userMessage = `Project: ${project.name}
 Description: ${project.description}
@@ -151,10 +162,10 @@ PRD template: ${project.template}
 Current PRD:
 ${currentPrd}
 
-Session Summaries (${project.sessions.length} stakeholder${project.sessions.length === 1 ? '' : 's'}):
-${summaries}
+Stakeholder interview transcripts (${project.sessions.length} stakeholder${project.sessions.length === 1 ? '' : 's'}):
+${transcripts}
 
-Produce an updated PRD using the "${project.template}" template. Attribute every non-trivial claim. Surface conflicts in the "Open Questions & Trade-offs" section.`
+Produce an updated PRD using the "${project.template}" template, grounded in what the stakeholders actually said in the transcripts above. Apply the faithfulness rules — copy named systems, numbers, and specific incidents verbatim. Attribute every non-trivial claim with [Name/Role]. Surface real conflicts in the "Open Questions & Trade-offs" section; do not invent conflicts that aren't in the transcripts.`
 
     const rawResponse = await callLlm(buildSynthesisSystem(template), [
       { role: 'user', content: userMessage },
@@ -195,6 +206,47 @@ function stripCodeFences(text: string): string {
   const fenced = text.match(/```(?:json)?\s*([\s\S]*?)```/)
   if (fenced) return fenced[1].trim()
   return text.trim()
+}
+
+interface SessionLike {
+  name: string
+  role: string
+  summary: string
+  messages: string
+}
+
+// Render a session's full transcript for the synthesiser. We use the actual
+// Q&A so the model can ground every PRD claim in something a stakeholder
+// said, rather than working from a lossy end-of-interview summary.
+//
+// Strips the auto-generated "Hi, I'm ready to begin." opener and drops the
+// [INTERVIEW_COMPLETE] tail block so the model isn't tempted to copy the
+// summary template back as content.
+function renderTranscript(session: SessionLike): string {
+  let messages: Array<{ role: string; content: string }> = []
+  try {
+    const parsed = JSON.parse(session.messages)
+    if (Array.isArray(parsed)) messages = parsed
+  } catch {
+    // Fall back to summary if messages JSON is corrupt
+    return `### ${session.name} (${session.role})\n${session.summary}`
+  }
+
+  const lines: string[] = [`### ${session.name} (${session.role})`]
+  for (const m of messages) {
+    const content = (m.content ?? '').trim()
+    if (!content) continue
+    if (m.role === 'user' && content === "Hi, I'm ready to begin.") continue
+    let body = content
+    // Drop everything from [INTERVIEW_COMPLETE] onward — that block is the
+    // assistant's summary template, not interview content.
+    const completeIdx = body.indexOf('[INTERVIEW_COMPLETE]')
+    if (completeIdx !== -1) body = body.slice(0, completeIdx).trim()
+    if (!body) continue
+    const speaker = m.role === 'user' ? session.name : 'Interviewer'
+    lines.push(`**${speaker}:** ${body}`)
+  }
+  return lines.join('\n\n')
 }
 
 export { PRD_TEMPLATES }
