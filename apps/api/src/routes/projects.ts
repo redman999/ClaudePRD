@@ -2,6 +2,7 @@ import { Router, Request, Response } from 'express'
 import { CreateProjectSchema } from '@claudeprd/contracts'
 import prisma from '../lib/prisma'
 import { listTemplates } from '../services/prd-templates'
+import { synthesizePrd } from '../services/prd-writer'
 
 const router = Router()
 
@@ -26,6 +27,36 @@ router.post('/', async (req: Request, res: Response) => {
     return res.status(201).json(project)
   } catch (err) {
     return res.status(500).json({ error: 'Failed to create project' })
+  }
+})
+
+// POST /api/projects/:id/resynthesize — force a fresh PRD synthesis using
+// the current synthesis prompt, without needing a new session. Useful after
+// the synthesis prompt or template is improved and existing projects need
+// their PRDs regenerated.
+router.post('/:id/resynthesize', async (req: Request, res: Response) => {
+  try {
+    const project = await prisma.project.findUnique({
+      where: { id: req.params.id },
+      include: { sessions: { where: { status: 'complete' }, select: { id: true } } },
+    })
+    if (!project) {
+      return res.status(404).json({ error: 'Project not found' })
+    }
+    if (project.sessions.length === 0) {
+      return res.status(409).json({ error: 'No completed sessions to synthesize from' })
+    }
+    // Fire-and-forget, same pattern as the post-session trigger
+    synthesizePrd(project.id).catch((err) =>
+      console.error('resynthesize: synthesizePrd failed', err)
+    )
+    return res.status(202).json({
+      message: 'Resynthesis triggered',
+      projectId: project.id,
+      sessionsConsumed: project.sessions.length,
+    })
+  } catch (err) {
+    return res.status(500).json({ error: 'Failed to trigger resynthesis' })
   }
 })
 
