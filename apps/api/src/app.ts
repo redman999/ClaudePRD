@@ -1,6 +1,8 @@
 import express from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
+import path from 'path';
+import fs from 'fs';
 import { errorHandler } from './middleware/error';
 import projectsRouter from './routes/projects';
 import sessionsRouter from './routes/sessions';
@@ -21,6 +23,19 @@ app.use('/api/projects', exportRouter);
 app.use('/api/sessions', sessionsRouter);
 
 app.use(errorHandler);
+
+// Serve the built web SPA from the api process so we ship as a single service.
+// Resolve relative to the compiled file (dist/app.js) so it works in any cwd.
+const webDist = path.resolve(__dirname, '../../web/dist');
+if (fs.existsSync(webDist)) {
+  app.use(express.static(webDist));
+  app.get(/^\/(?!api\/|health$).*/, (_req, res) => {
+    res.sendFile(path.join(webDist, 'index.html'));
+  });
+  console.log(`Serving web SPA from ${webDist}`);
+} else {
+  console.log(`Web SPA not found at ${webDist} — running API-only`);
+}
 
 const PORT = process.env.PORT ? parseInt(process.env.PORT) : 4003;
 app.listen(PORT, () => {
