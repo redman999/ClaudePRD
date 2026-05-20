@@ -1,9 +1,12 @@
 import { Router, Request, Response } from 'express'
 import { CreateSessionSchema, SendMessageSchema, Message } from '@claudeprd/contracts'
 import prisma from '../lib/prisma'
-import { buildInterviewSystemPrompt } from '../services/interview'
+import {
+  buildInterviewSystemPrompt,
+  extractInterviewCompletion,
+  extractQuickReplies,
+} from '../services/interview'
 import { callLlm } from '../services/llm'
-import { extractInterviewCompletion } from '../services/interview'
 import { synthesizePrd } from '../services/prd-writer'
 import {
   scoreExchange,
@@ -22,7 +25,7 @@ router.post('/', async (req: Request, res: Response) => {
     return res.status(400).json({ error: 'Validation failed', issues: result.error.issues })
   }
 
-  const { shareToken, name, role } = result.data
+  const { shareToken, name, role, mode } = result.data
 
   try {
     const project = await prisma.project.findUnique({ where: { shareToken } })
@@ -35,6 +38,7 @@ router.post('/', async (req: Request, res: Response) => {
         projectId: project.id,
         name,
         role,
+        mode: mode ?? 'standard',
         status: 'active',
         messages: '[]',
       },
@@ -45,6 +49,7 @@ router.post('/', async (req: Request, res: Response) => {
       projectId: session.projectId,
       name: session.name,
       role: session.role,
+      mode: session.mode,
       status: session.status,
       messages: [],
       createdAt: session.createdAt,
@@ -174,7 +179,14 @@ router.post('/:id/messages', async (req: Request, res: Response) => {
       ? rawText.slice(0, rawText.indexOf('[INTERVIEW_COMPLETE]')).trim()
       : rawText
 
-    const exchangeScores = await scoreExchange(latestUserMessage, cleanAssistantText)
+    // In guided mode, pull QUICK_REPLIES out of the body and send them as
+    // a separate field so the frontend can render buttons.
+    const { cleanText: bodyForUser, quickReplies } =
+      session.mode === 'guided'
+        ? extractQuickReplies(cleanAssistantText)
+        : { cleanText: cleanAssistantText, quickReplies: [] as string[] }
+
+    const exchangeScores = await scoreExchange(latestUserMessage, bodyForUser)
     const prevCoverage = normalizeCoverage(session.coveredAreas)
     const newCoverage = mergeCoverage(prevCoverage, exchangeScores)
 
@@ -183,7 +195,13 @@ router.post('/:id/messages', async (req: Request, res: Response) => {
     const coverageInsufficient =
       isComplete && !coverageFallback && !isCoverageSufficient(newCoverage)
     const stripMarker = tooEarly || coverageInsufficient
-    const assistantText = stripMarker ? cleanAssistantText : rawText
+    // The text we store in the transcript is the user-facing body (no marker,
+    // no QUICK_REPLIES block), with the marker re-appended at session end.
+    const assistantText = stripMarker
+      ? bodyForUser
+      : isComplete
+        ? bodyForUser
+        : bodyForUser
 
     messages.push({ role: 'assistant', content: assistantText })
 
@@ -203,6 +221,7 @@ router.post('/:id/messages', async (req: Request, res: Response) => {
         message: { role: 'assistant', content: assistantText },
         sessionStatus: 'complete',
         coverage: newCoverage,
+        quickReplies,
       })
     }
 
@@ -219,6 +238,7 @@ router.post('/:id/messages', async (req: Request, res: Response) => {
       sessionStatus: 'active',
       coverage: newCoverage,
       uncoveredAreas: uncoveredAreas(newCoverage),
+      quickReplies,
     })
   } catch (err) {
     console.error(err)

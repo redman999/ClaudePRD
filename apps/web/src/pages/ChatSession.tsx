@@ -32,6 +32,7 @@ interface SessionInfo {
   id: string
   name: string
   role: string
+  mode?: 'standard' | 'guided'
   status: 'active' | 'complete'
   messages: Message[]
   coverage?: CoverageScores
@@ -55,6 +56,7 @@ export default function ChatSession() {
   const [sessionComplete, setSessionComplete] = useState(false)
   const [showOverlay, setShowOverlay] = useState(false)
   const [coverage, setCoverage] = useState<CoverageScores>(EMPTY_COVERAGE)
+  const [quickReplies, setQuickReplies] = useState<string[]>([])
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const autoStarted = useRef(false)
 
@@ -70,11 +72,13 @@ export default function ChatSession() {
       setMessages(prev => [...prev, { role: 'user' as const, content }])
     }
 
+    setQuickReplies([])
     try {
       const data = await apiFetch<{
         message: Message
         sessionStatus: 'active' | 'complete'
         coverage?: CoverageScores
+        quickReplies?: string[]
       }>(`/api/sessions/${sessionId}/messages`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -82,6 +86,9 @@ export default function ChatSession() {
       })
       setMessages(prev => [...prev, data.message])
       if (data.coverage) setCoverage(data.coverage)
+      if (data.quickReplies && data.quickReplies.length > 0) {
+        setQuickReplies(data.quickReplies)
+      }
       if (data.sessionStatus === 'complete') {
         setSessionComplete(true)
         setShowOverlay(true)
@@ -159,7 +166,14 @@ export default function ChatSession() {
       <div className="bg-white border-b border-gray-200 px-4 py-3 flex-shrink-0">
         <div className="max-w-2xl mx-auto flex items-start justify-between">
           <div>
-            <p className="text-xs font-semibold text-indigo-600 uppercase tracking-wide">ClaudePRD Interview</p>
+            <div className="flex items-center gap-2">
+              <p className="text-xs font-semibold text-indigo-600 uppercase tracking-wide">ClaudePRD Interview</p>
+              {session?.mode === 'guided' && (
+                <span className="text-[10px] font-semibold uppercase tracking-wide bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full">
+                  Guided
+                </span>
+              )}
+            </div>
             {session && (
               <p className="text-sm text-gray-600">{session.name} · {session.role}</p>
             )}
@@ -283,23 +297,39 @@ export default function ChatSession() {
               Interview complete — thank you for your contribution!
             </p>
           ) : (
-            <form onSubmit={handleSend} className="flex gap-2">
-              <input
-                type="text"
-                value={input}
-                onChange={e => setInput(e.target.value)}
-                disabled={sending}
-                placeholder={sending ? 'Claude is thinking…' : 'Type your response…'}
-                className="flex-1 border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
-              />
-              <button
-                type="submit"
-                disabled={sending || !input.trim()}
-                className="bg-indigo-600 text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                Send
-              </button>
-            </form>
+            <>
+              {quickReplies.length > 0 && !sending && (
+                <div className="flex flex-wrap gap-2 mb-3">
+                  {quickReplies.map((opt, i) => (
+                    <button
+                      key={`${i}-${opt}`}
+                      type="button"
+                      onClick={() => setInput(opt)}
+                      className="text-sm border border-indigo-200 bg-indigo-50 hover:bg-indigo-100 text-indigo-800 rounded-full px-3 py-1.5 transition-colors"
+                    >
+                      {opt}
+                    </button>
+                  ))}
+                </div>
+              )}
+              <form onSubmit={handleSend} className="flex gap-2">
+                <input
+                  type="text"
+                  value={input}
+                  onChange={e => setInput(e.target.value)}
+                  disabled={sending}
+                  placeholder={sending ? 'Claude is thinking…' : 'Type your response…'}
+                  className="flex-1 border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
+                />
+                <button
+                  type="submit"
+                  disabled={sending || !input.trim()}
+                  className="bg-indigo-600 text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Send
+                </button>
+              </form>
+            </>
           )}
         </div>
       </div>

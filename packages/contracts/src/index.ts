@@ -16,10 +16,14 @@ export const CreateProjectSchema = z.object({
   template: z.enum(PRD_TEMPLATE_NAMES).optional(),
 })
 
+export const INTERVIEW_MODES = ['standard', 'guided'] as const
+export type InterviewMode = (typeof INTERVIEW_MODES)[number]
+
 export const CreateSessionSchema = z.object({
   shareToken: z.string().min(1),
   name: z.string().min(1),
   role: z.string().min(1),
+  mode: z.enum(INTERVIEW_MODES).optional(),
 })
 
 export const SendMessageSchema = z.object({

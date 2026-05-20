@@ -32,6 +32,7 @@ export default function JoinSession() {
 
   const [name, setName] = useState('')
   const [role, setRole] = useState('')
+  const [mode, setMode] = useState<'standard' | 'guided'>('standard')
   const [errors, setErrors] = useState<FormErrors>({})
   const [submitting, setSubmitting] = useState(false)
   const [apiError, setApiError] = useState<string | null>(null)
@@ -84,7 +85,7 @@ export default function JoinSession() {
       const res = await fetch('/api/sessions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ shareToken, name: trimmedName, role: trimmedRole }),
+        body: JSON.stringify({ shareToken, name: trimmedName, role: trimmedRole, mode }),
       })
       if (!res.ok) {
         const data = await res.json().catch(() => ({}))
@@ -183,6 +184,50 @@ export default function JoinSession() {
               {ROLE_SUGGESTIONS.map(r => <option key={r} value={r} />)}
             </datalist>
             {errors.role && <p className="text-red-600 text-xs mt-1">{errors.role}</p>}
+          </div>
+
+          <div>
+            <p className="block text-sm font-medium text-gray-700 mb-2">
+              How would you like to be interviewed?
+            </p>
+            <div className="space-y-2">
+              <label className={`flex items-start gap-3 border rounded-lg p-3 cursor-pointer transition-colors ${mode === 'standard' ? 'border-indigo-500 bg-indigo-50' : 'border-gray-200 hover:bg-gray-50'}`}>
+                <input
+                  type="radio"
+                  name="mode"
+                  value="standard"
+                  checked={mode === 'standard'}
+                  onChange={() => setMode('standard')}
+                  disabled={submitting}
+                  className="mt-0.5"
+                />
+                <div className="flex-1">
+                  <div className="text-sm font-medium text-gray-900">Free-form</div>
+                  <p className="text-xs text-gray-500 mt-0.5">
+                    Open-ended questions across topics. Best if you've been through requirements interviews before.
+                  </p>
+                </div>
+              </label>
+              <label className={`flex items-start gap-3 border rounded-lg p-3 cursor-pointer transition-colors ${mode === 'guided' ? 'border-indigo-500 bg-indigo-50' : 'border-gray-200 hover:bg-gray-50'}`}>
+                <input
+                  type="radio"
+                  name="mode"
+                  value="guided"
+                  checked={mode === 'guided'}
+                  onChange={() => setMode('guided')}
+                  disabled={submitting}
+                  className="mt-0.5"
+                />
+                <div className="flex-1">
+                  <div className="text-sm font-medium text-gray-900">
+                    Guided <span className="text-xs font-normal text-indigo-700">(recommended if you're new to this)</span>
+                  </div>
+                  <p className="text-xs text-gray-500 mt-0.5">
+                    One plain-language question at a time, with examples. Some questions have click-to-pick options.
+                  </p>
+                </div>
+              </label>
+            </div>
           </div>
 
           <div className="pt-2">

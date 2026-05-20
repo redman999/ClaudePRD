@@ -28,6 +28,7 @@ model Session {
   project      Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
   name         String
   role         String
+  mode         String       @default("standard")
   status       String       @default("active")
   messages     String       @default("[]")
   summary      String       @default("")
