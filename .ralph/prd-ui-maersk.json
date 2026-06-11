@@ -1,0 +1,262 @@
+[
+  {
+    "id": "U1",
+    "name": "Phase U1 — Maersk Design foundation (tokens, fonts, primitives)",
+    "status": "active",
+    "goal": "Establish a Maersk Design visual foundation in the existing Tailwind setup: brand color tokens, Inter/Fira Code typography, and a small set of reusable UI primitives. Frontend-only (apps/web); the API and the anonymous share-link/name+role flow are NOT touched.",
+    "scope_note": "This is a Tailwind REPLICA of Maersk Design (no @maersk-global packages — they are not on a reachable registry and would not build on Railway). Palette derived from the live Maersk ALP platform: Maersk Blue #42b0d5, deep blue #00a3e0, steel #b0c4d8, slate #6b7b8d, amber #f0b429; Inter (UI) + Fira Code (mono).",
+    "stories": [
+      {
+        "id": "U1-S1",
+        "title": "Extend Tailwind theme with Maersk Design tokens",
+        "description": "Edit apps/web/tailwind.config.ts to add a Maersk palette under theme.extend.colors: maersk: { blue:'#42b0d5', 'blue-deep':'#00a3e0', steel:'#b0c4d8', slate:'#6b7b8d', amber:'#f0b429', ink:'#141b25', surface:'#f0f4f8' } and a primary scale aliased to Maersk Blue. Add fontFamily.sans = ['Inter','system-ui','-apple-system','sans-serif'] and fontFamily.mono = ['Fira Code','ui-monospace','monospace']. Add a borderRadius token (e.g. 'mds' = '0.5rem') and a subtle shadow ('mds'). Update apps/web/src/index.css base layer: body bg-maersk-surface text-maersk-ink, and a global focus-visible ring in Maersk Blue. Do NOT change any component markup yet.",
+        "status": "todo",
+        "acceptance_criteria": [
+          "tailwind.config.ts defines maersk.blue '#42b0d5', maersk.steel, maersk.slate, maersk.amber and sans=Inter / mono=Fira Code (grep confirms)",
+          "index.css base sets the Maersk surface/ink colors and a focus-visible ring",
+          "npm run check (web) exits 0",
+          "npm run build (web) succeeds",
+          "npm run test exits 0"
+        ],
+        "output_files": [
+          "apps/web/tailwind.config.ts",
+          "apps/web/src/index.css"
+        ]
+      },
+      {
+        "id": "U1-S2",
+        "title": "Load Inter + Fira Code fonts (self-hosted, offline-safe)",
+        "description": "Add the Inter and Fira Code webfonts so the build does not depend on a runtime Google Fonts request (Maersk-network friendly). Prefer @fontsource/inter and @fontsource/fira-code (npm) imported in main.tsx, or vendor the woff2 files under apps/web/src/assets/fonts and @font-face them in index.css. Ensure the fonts actually apply (body renders in Inter). Keep bundle reasonable (only needed weights: 400/500/600/700 for Inter, 400 for Fira Code).",
+        "status": "todo",
+        "acceptance_criteria": [
+          "Inter and Fira Code are bundled locally (no external fonts.googleapis.com request at runtime)",
+          "Computed body font-family resolves to Inter (verify via built CSS / inspection)",
+          "npm run check (web) exits 0",
+          "npm run build (web) succeeds",
+          "npm run test exits 0"
+        ],
+        "output_files": [
+          "apps/web/src/main.tsx",
+          "apps/web/src/index.css",
+          "apps/web/package.json"
+        ]
+      },
+      {
+        "id": "U1-S3",
+        "title": "Create Maersk UI primitives: Button, Card, Input, Badge, Spinner",
+        "description": "Create apps/web/src/ui/ with small, reusable, typed components styled to Maersk Design: Button (variants: primary=Maersk Blue solid, secondary=steel outline, ghost; sizes sm/md; loading state), Card (white surface, mds radius+shadow, optional header), Input + Textarea + Label (steel border, Maersk Blue focus ring, error state), Badge (status colors: blue/green/amber/slate), Spinner. Export from apps/web/src/ui/index.ts. Add a lightweight cn() class-merge helper (clsx). Do not yet refactor pages to use them (that is U2/U3) — but render them in a tiny throwaway story/test to prove they compile and accept props.",
+        "status": "todo",
+        "acceptance_criteria": [
+          "apps/web/src/ui/{Button,Card,Input,Badge,Spinner}.tsx exist and are exported from ui/index.ts",
+          "A unit/render test mounts Button (primary+loading) and Badge and asserts they render",
+          "npm run check (web) exits 0",
+          "npm run test exits 0"
+        ],
+        "output_files": [
+          "apps/web/src/ui/Button.tsx",
+          "apps/web/src/ui/Card.tsx",
+          "apps/web/src/ui/Input.tsx",
+          "apps/web/src/ui/Badge.tsx",
+          "apps/web/src/ui/Spinner.tsx",
+          "apps/web/src/ui/cn.ts",
+          "apps/web/src/ui/index.ts",
+          "apps/web/src/ui/ui.test.tsx"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "U2",
+    "name": "Phase U2 — App shell, navigation & global states",
+    "status": "pending",
+    "goal": "Redesign the app frame: a Maersk-style header/navbar, a consistent page shell/container, and standardized loading/empty/error states using the new primitives.",
+    "stories": [
+      {
+        "id": "U2-S1",
+        "title": "Maersk-style Navbar + app shell layout",
+        "description": "Redesign apps/web/src/components/Navbar.tsx into a Maersk header: a top brand bar with the ClaudePRD wordmark, a Maersk Blue accent (e.g. a thin top border or logo block in #42b0d5), Inter type, and a clean white surface with a subtle bottom border. Create apps/web/src/components/AppShell.tsx providing a max-width container, consistent horizontal padding, and vertical rhythm; wrap the routed pages in it. Keep the existing routes/links working (Home link, etc.).",
+        "status": "todo",
+        "acceptance_criteria": [
+          "Navbar renders the brand with a Maersk Blue accent and Inter type; existing Home navigation still works",
+          "AppShell wraps pages with a max-width container + consistent padding (used in App.tsx)",
+          "[MANUAL] Header visually matches a clean Maersk look at desktop and 375px",
+          "npm run check (web) exits 0",
+          "npm run build (web) succeeds",
+          "npm run test exits 0"
+        ],
+        "output_files": [
+          "apps/web/src/components/Navbar.tsx",
+          "apps/web/src/components/AppShell.tsx",
+          "apps/web/src/App.tsx"
+        ]
+      },
+      {
+        "id": "U2-S2",
+        "title": "Standardize loading skeletons, empty states, and error banners",
+        "description": "Create apps/web/src/components/feedback/{Skeleton,EmptyState,ErrorBanner}.tsx in Maersk style (steel/slate tones, Maersk Blue accents) and a small Toast/inline-status pattern. These replace the ad-hoc gray boxes and raw error text currently used across pages. Do not rewire every page here — just provide the components and use them on at least one page (Home) as the reference implementation.",
+        "status": "todo",
+        "acceptance_criteria": [
+          "Skeleton, EmptyState, ErrorBanner components exist and are used on Home",
+          "Render test mounts EmptyState and ErrorBanner",
+          "npm run check (web) exits 0",
+          "npm run test exits 0"
+        ],
+        "output_files": [
+          "apps/web/src/components/feedback/Skeleton.tsx",
+          "apps/web/src/components/feedback/EmptyState.tsx",
+          "apps/web/src/components/feedback/ErrorBanner.tsx",
+          "apps/web/src/pages/Home.tsx"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "U3",
+    "name": "Phase U3 — Page redesigns (Maersk look + layout)",
+    "status": "pending",
+    "goal": "Restyle and re-layout every page using the new tokens, primitives, and shell. Behaviour and data flow stay identical; only presentation/layout changes. Anonymous join (name+role+mode) is preserved.",
+    "stories": [
+      {
+        "id": "U3-S1",
+        "title": "Home (project list) redesign",
+        "description": "Rebuild apps/web/src/pages/Home.tsx using Card/Badge/Button and a responsive grid of project cards (name, truncated description, session-count badge, last-updated). Maersk-styled 'New Project' primary button and a polished empty state. Preserve the existing fetch + navigation behaviour.",
+        "status": "todo",
+        "acceptance_criteria": [
+          "Home renders a responsive grid of Maersk-styled project cards using the ui primitives",
+          "Existing project fetch + 'New Project' navigation still work",
+          "[MANUAL] Looks clean at 375px and desktop",
+          "npm run check (web) exits 0",
+          "npm run build (web) succeeds",
+          "npm run test exits 0"
+        ],
+        "output_files": [
+          "apps/web/src/pages/Home.tsx"
+        ]
+      },
+      {
+        "id": "U3-S2",
+        "title": "NewProject form redesign",
+        "description": "Restyle apps/web/src/pages/NewProject.tsx with the Input/Textarea/Label/Button primitives, a Card-wrapped form, Maersk Blue focus rings, and inline validation styling. Preserve client-side validation, the template/topic fields, the POST, and redirect behaviour.",
+        "status": "todo",
+        "acceptance_criteria": [
+          "Form uses the Maersk Input/Button primitives and Card layout; validation + submit + redirect unchanged",
+          "[MANUAL] Form reads as a Maersk form (labels, focus rings, spacing)",
+          "npm run check (web) exits 0",
+          "npm run build (web) succeeds",
+          "npm run test exits 0"
+        ],
+        "output_files": [
+          "apps/web/src/pages/NewProject.tsx"
+        ]
+      },
+      {
+        "id": "U3-S3",
+        "title": "JoinSession landing redesign (keep anonymous name+role+mode)",
+        "description": "Restyle apps/web/src/pages/JoinSession.tsx: a welcoming Maersk landing card with project context, the name + role (datalist) + interview-mode (standard/guided) form using the primitives. The anonymous flow is unchanged — no login, no accounts. Preserve lookup/resume + create-session behaviour.",
+        "status": "todo",
+        "acceptance_criteria": [
+          "Join landing is Maersk-styled; name/role/mode form and existing create/resume behaviour preserved (still anonymous)",
+          "[MANUAL] Landing looks polished at 375px and desktop",
+          "npm run check (web) exits 0",
+          "npm run build (web) succeeds",
+          "npm run test exits 0"
+        ],
+        "output_files": [
+          "apps/web/src/pages/JoinSession.tsx"
+        ]
+      },
+      {
+        "id": "U3-S4",
+        "title": "ProjectDashboard redesign + responsive 2-column layout",
+        "description": "Rebuild apps/web/src/pages/ProjectDashboard.tsx layout: a Maersk header block (name/description/topic), the share-link + copy control restyled, a two-column responsive layout (sessions list + PRD preview), Maersk-styled export buttons, and use of SessionList/PrdPreview. Preserve polling, copy-to-clipboard, export hrefs, and all data behaviour.",
+        "status": "todo",
+        "acceptance_criteria": [
+          "Dashboard uses a responsive 2-col layout with Maersk styling; polling, copy link, and export still work",
+          "[MANUAL] Collapses cleanly to a single column at 375px",
+          "npm run check (web) exits 0",
+          "npm run build (web) succeeds",
+          "npm run test exits 0"
+        ],
+        "output_files": [
+          "apps/web/src/pages/ProjectDashboard.tsx"
+        ]
+      },
+      {
+        "id": "U3-S5",
+        "title": "ChatSession interview UI redesign",
+        "description": "Restyle apps/web/src/pages/ChatSession.tsx: Maersk chat bubbles (user = Maersk Blue, assistant = white card with a Maersk avatar mark), redesigned coverage progress bars (Maersk Blue fill, steel track), quick-reply chips, typing indicator, and the completion overlay — all using the tokens/primitives. Preserve auto-start (__START__), optimistic send, coverage display, quick-reply, and completion behaviour exactly.",
+        "status": "todo",
+        "acceptance_criteria": [
+          "Chat bubbles, coverage bars, quick replies, typing indicator and completion overlay are Maersk-styled",
+          "Auto-start, send/typing, coverage, quick-reply and completion behaviour are unchanged",
+          "[MANUAL] Chat is usable and clean at 375px and desktop",
+          "npm run check (web) exits 0",
+          "npm run build (web) succeeds",
+          "npm run test exits 0"
+        ],
+        "output_files": [
+          "apps/web/src/pages/ChatSession.tsx"
+        ]
+      },
+      {
+        "id": "U3-S6",
+        "title": "Restyle SessionList + PrdPreview (markdown typography)",
+        "description": "Restyle apps/web/src/components/SessionList.tsx (Maersk rows + status Badges + relative time) and apps/web/src/components/PrdPreview.tsx (Maersk 'prose'-style markdown: Inter headings, readable measure, steel rules, Fira Code for code blocks). Preserve react-markdown rendering and the empty-state placeholder.",
+        "status": "todo",
+        "acceptance_criteria": [
+          "SessionList uses Maersk Badges + rows; PrdPreview renders markdown with Maersk typography (code in Fira Code)",
+          "react-markdown rendering + empty-state preserved",
+          "npm run check (web) exits 0",
+          "npm run build (web) succeeds",
+          "npm run test exits 0"
+        ],
+        "output_files": [
+          "apps/web/src/components/SessionList.tsx",
+          "apps/web/src/components/PrdPreview.tsx"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "U4",
+    "name": "Phase U4 — Responsive, accessibility & deploy polish",
+    "status": "pending",
+    "goal": "Final consistency sweep: responsiveness at 375px, accessible focus/contrast, a consistency audit, and confirmation the build is Railway-ready via the existing pipeline.",
+    "stories": [
+      {
+        "id": "U4-S1",
+        "title": "Responsive + accessibility pass across all pages",
+        "description": "Audit every page at 375px and desktop: ensure full-width layouts collapse cleanly, tap targets are adequate, all interactive elements have visible focus-visible rings (Maersk Blue), color contrast meets WCAG AA against the Maersk palette, inputs have associated labels, and the chat list scrolls correctly. Fix issues found. No behavioural changes.",
+        "status": "todo",
+        "acceptance_criteria": [
+          "All pages reviewed at 375px and desktop; layout/focus/contrast issues fixed",
+          "Interactive elements show a visible Maersk Blue focus-visible ring; inputs have labels",
+          "[MANUAL] Spot-check Home, NewProject, JoinSession, ProjectDashboard, ChatSession at 375px",
+          "npm run check (web) exits 0",
+          "npm run build (web) succeeds",
+          "npm run test exits 0"
+        ],
+        "output_files": [
+          "apps/web/src/index.css"
+        ]
+      },
+      {
+        "id": "U4-S2",
+        "title": "Consistency sweep + Railway-ready build confirmation + docs",
+        "description": "Final sweep: remove leftover legacy indigo/ad-hoc styles in favour of Maersk tokens/primitives (grep for stray 'indigo' classes), ensure spacing/typography are consistent, and confirm the production build works through the existing Railway pipeline (root build → web build → api serves SPA). Add a short 'Maersk Design refresh' note to a UI section of the project (e.g. apps/web/README.md or CLAUDE.md) describing the palette, fonts, primitives, and that it is a Tailwind replica (no @maersk-global dependency). Do not change Railway config or the API.",
+        "status": "todo",
+        "acceptance_criteria": [
+          "grep shows no stray legacy 'indigo-' utility classes left in apps/web/src",
+          "Root production build succeeds (npm run build across workspaces) — Railway pipeline unaffected",
+          "A short Maersk Design refresh note documents palette/fonts/primitives + 'Tailwind replica, no @maersk-global dep'",
+          "npm run check (web) exits 0",
+          "npm run test exits 0"
+        ],
+        "output_files": [
+          "apps/web/README.md",
+          "apps/web/src/index.css"
+        ]
+      }
+    ]
+  }
+]
