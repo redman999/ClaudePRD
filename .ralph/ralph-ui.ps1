@@ -17,6 +17,8 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
+# Run from the repo root regardless of the caller's working directory ($PSScriptRoot = the .ralph dir).
+Set-Location (Join-Path $PSScriptRoot "..")
 $prd  = ".ralph/prd-ui-maersk.json"
 $log  = ".ralph/progress-ui.txt"
 
