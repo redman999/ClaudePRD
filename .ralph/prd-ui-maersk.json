@@ -74,7 +74,7 @@
       {
         "id": "U2-S1",
         "title": "Maersk-style Navbar + app shell layout",
-        "description": "Redesign apps/web/src/components/Navbar.tsx into a Maersk header: a top brand bar with the ClaudePRD wordmark, a Maersk Blue accent (e.g. a thin top border or logo block in #42b0d5), Inter type, and a clean white surface with a subtle bottom border. Create apps/web/src/components/AppShell.tsx providing a max-width container, consistent horizontal padding, and vertical rhythm; wrap the routed pages in it. Keep the existing routes/links working (Home link, etc.).",
+        "description": "Redesign apps/web/src/components/Navbar.tsx into a Maersk header: a top brand bar with the Maersk PRD Studio wordmark, a Maersk Blue accent (e.g. a thin top border or logo block in #42b0d5), Inter type, and a clean white surface with a subtle bottom border. Create apps/web/src/components/AppShell.tsx providing a max-width container, consistent horizontal padding, and vertical rhythm; wrap the routed pages in it. Keep the existing routes/links working (Home link, etc.).",
         "status": "todo",
         "acceptance_criteria": [
           "Navbar renders the brand with a Maersk Blue accent and Inter type; existing Home navigation still works",

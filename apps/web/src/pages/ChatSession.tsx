@@ -167,7 +167,7 @@ export default function ChatSession() {
         <div className="max-w-2xl mx-auto flex items-start justify-between">
           <div>
             <div className="flex items-center gap-2">
-              <p className="text-xs font-semibold text-indigo-600 uppercase tracking-wide">ClaudePRD Interview</p>
+              <p className="text-xs font-semibold text-indigo-600 uppercase tracking-wide">Maersk PRD Studio Interview</p>
               {session?.mode === 'guided' && (
                 <span className="text-[10px] font-semibold uppercase tracking-wide bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full">
                   Guided

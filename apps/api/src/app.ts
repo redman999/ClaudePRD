@@ -15,7 +15,7 @@ app.use(express.json());
 app.use(morgan('dev'));
 
 app.get('/health', (_req, res) => {
-  res.json({ status: 'ok', service: 'claudeprd-api', version: '0.1.0' });
+  res.json({ status: 'ok', service: 'maersk-prd-studio-api', version: '0.1.0' });
 });
 
 app.use('/api/projects', projectsRouter);

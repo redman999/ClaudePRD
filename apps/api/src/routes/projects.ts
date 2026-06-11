@@ -1,5 +1,5 @@
 import { Router, Request, Response } from 'express'
-import { CreateProjectSchema } from '@claudeprd/contracts'
+import { CreateProjectSchema } from '@maersk-prd-studio/contracts'
 import prisma from '../lib/prisma'
 import { listTemplates } from '../services/prd-templates'
 import { synthesizePrd } from '../services/prd-writer'

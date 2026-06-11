@@ -1,8 +1,8 @@
-# CLAUDE.md — ClaudePRD
+# CLAUDE.md — Maersk PRD Studio
 
 ## What this project is
 
-ClaudePRD is a web app for AI-powered PRD generation. A project creator sets up a
+Maersk PRD Studio is a web app for AI-powered PRD generation. A project creator sets up a
 project (name, description, topic), shares a link with stakeholders, and each
 stakeholder has a role-adaptive Claude interview. Claude asks drilling questions,
 detects coverage completeness, and synthesizes all session inputs into a live shared
@@ -47,7 +47,7 @@ npm run dev   # :5182
 ## Ralph loop — how to make progress
 
 ```bash
-cd C:\Users\chris\ClaudePRD
+cd "C:\Users\CGR126\OneDrive - Maersk Group\Claude\maersk-prd-studio"
 .ralph/ralph.sh 30           # run up to 30 iterations
 .ralph/ralph-once.sh         # run a single iteration
 ```

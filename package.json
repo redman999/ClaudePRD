@@ -1,5 +1,5 @@
 {
-  "name": "claudeprd",
+  "name": "maersk-prd-studio",
   "private": true,
   "workspaces": [
     "apps/api",

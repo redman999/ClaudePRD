@@ -123,7 +123,7 @@ export default function JoinSession() {
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-lg mx-auto px-4 py-12">
         <div className="text-center mb-8">
-          <p className="text-xs font-semibold text-indigo-600 uppercase tracking-wide mb-2">ClaudePRD Interview</p>
+          <p className="text-xs font-semibold text-indigo-600 uppercase tracking-wide mb-2">Maersk PRD Studio Interview</p>
           <h1 className="text-2xl font-bold text-gray-900 mb-2">{project!.name}</h1>
           <p className="text-gray-600 text-sm">{project!.description}</p>
           <p className="text-gray-400 text-xs mt-1">Topic: {project!.topic}</p>
