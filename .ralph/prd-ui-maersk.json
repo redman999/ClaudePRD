@@ -167,7 +167,9 @@
         "id": "U3-S3",
         "title": "JoinSession landing redesign (keep anonymous name+role+mode)",
         "description": "Restyle apps/web/src/pages/JoinSession.tsx: a welcoming Maersk landing card with project context, the name + role (datalist) + interview-mode (standard/guided) form using the primitives. The anonymous flow is unchanged — no login, no accounts. Preserve lookup/resume + create-session behaviour.",
-        "status": "todo",
+        "status": "done",
+        "completed": "2026-06-12",
+        "completion_notes": "Rebuilt JoinSession.tsx markup onto the Maersk primitives. Landing header now pairs the /pmark.svg logo mark with a Maersk Blue 'Maersk PRD Studio Interview' eyebrow, project name (ink), description + topic (slate). The invite blurb moved off indigo onto a primary-50 / maersk-blue/20 surface; the form is wrapped in a Card with Label (required amber marker) + Input fields (steel border, Maersk Blue focus ring, error prop + aria-invalid/aria-describedby a11y wiring). The role datalist is preserved. Interview-mode radio cards restyled to Maersk tokens (selected = border-maersk-blue + bg-primary-50, accent-maersk-blue radios). Submit is the primary Button with its built-in loading spinner (loading={submitting}); the not-found state is now a centered Maersk Card and the api error renders via the shared dismissable ErrorBanner. All behaviour preserved verbatim: project lookup useEffect, validate(), error-clearing onChange, handleSubmit (lookup/resume then create-session, raw fetch, trims, mode), and submitting state — anonymous, no login. check (web) + build (web) + repo-root test (12 api + 11 web) all green.",
         "acceptance_criteria": [
           "Join landing is Maersk-styled; name/role/mode form and existing create/resume behaviour preserved (still anonymous)",
           "[MANUAL] Landing looks polished at 375px and desktop",

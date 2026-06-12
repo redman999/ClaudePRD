@@ -97,3 +97,21 @@ NOTES: Swapped NewProject.tsx markup onto the Maersk UI primitives with zero beh
   (FormValues/FormErrors), validate(), handleChange clearing, trim + optional targetAudience, the
   POST, and redirect are all unchanged.
 ------------------------------------------------------------
+------------------------------------------------------------
+[2026-06-12 12:00] STORY U3-S3 — JoinSession landing redesign (keep anonymous name+role+mode)
+STATUS: DONE
+CRITERIA:
+  [PASS] Join landing is Maersk-styled; name/role/mode form and existing create/resume behaviour preserved (still anonymous) — rebuilt on Card/Label/Input/Button + ErrorBanner; lookup/resume then create-session raw fetch, validate(), trims, mode and submitting state all preserved verbatim; no login/accounts added.
+  [SKIP] [MANUAL] Landing looks polished at 375px and desktop — visual-only; max-w-lg column, centered header with pmark + eyebrow, Card form, full-width primary Button collapse cleanly. Human to eyeball.
+  [PASS] npm run check (web) exits 0
+  [PASS] npm run build (web) succeeds
+  [PASS] npm run test exits 0 — 12 api + 11 web tests pass
+NOTES: Restyled JoinSession.tsx to Maersk Design. Header now pairs the /pmark.svg mark with a
+       Maersk Blue 'Maersk PRD Studio Interview' eyebrow over the project name/description/topic.
+       Invite blurb moved off indigo onto a primary-50 surface; form wrapped in a Card with Label
+       (amber required marker) + Input (steel border / Maersk Blue focus ring / error + aria wiring),
+       role datalist preserved, interview-mode radio cards on Maersk tokens (selected border-maersk-blue
+       + bg-primary-50, accent-maersk-blue), submit via primary Button loading spinner. Not-found
+       state is a centered Maersk Card; api errors render via the dismissable ErrorBanner. No API,
+       schema, contracts, or share-link/name+role flow touched.
+------------------------------------------------------------
