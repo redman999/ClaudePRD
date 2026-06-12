@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { apiFetch } from '../lib/api'
-import { Button } from '../ui'
+import { Badge, Button, Card } from '../ui'
 import { EmptyState, ErrorBanner, SkeletonCard } from '../components/feedback'
 
 interface ProjectListItem {
@@ -51,7 +51,7 @@ export default function Home() {
       )}
 
       {loading ? (
-        <div className="space-y-4">
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
           <SkeletonCard />
           <SkeletonCard />
           <SkeletonCard />
@@ -67,23 +67,30 @@ export default function Home() {
           }
         />
       ) : (
-        <ul className="space-y-4">
+        <ul className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {projects.map(project => (
             <li key={project.id}>
               <Link
                 to={`/projects/${project.id}`}
-                className="block rounded-mds border border-maersk-steel/50 bg-white p-5 shadow-mds transition-all hover:border-maersk-blue hover:shadow-md"
+                className="group block h-full rounded-mds focus-visible:outline-none"
               >
-                <div className="flex items-start justify-between gap-4">
-                  <div className="min-w-0">
-                    <h2 className="truncate text-lg font-semibold text-maersk-ink">{project.name}</h2>
-                    <p className="mt-1 text-sm text-maersk-slate">{truncate(project.description, 80)}</p>
+                <Card
+                  padded={false}
+                  className="flex h-full flex-col p-5 transition-all group-hover:border-maersk-blue group-hover:shadow-md"
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <h2 className="min-w-0 truncate text-lg font-semibold text-maersk-ink">
+                      {project.name}
+                    </h2>
+                    <Badge color="blue" className="shrink-0">
+                      {project._count.sessions} {project._count.sessions === 1 ? 'session' : 'sessions'}
+                    </Badge>
                   </div>
-                  <span className="shrink-0 rounded-full bg-primary-50 px-2.5 py-1 text-xs font-medium text-primary-700">
-                    {project._count.sessions} {project._count.sessions === 1 ? 'session' : 'sessions'}
-                  </span>
-                </div>
-                <p className="mt-3 text-xs text-maersk-slate/80">Updated {formatDate(project.updatedAt)}</p>
+                  <p className="mt-2 flex-1 text-sm text-maersk-slate">
+                    {truncate(project.description, 110)}
+                  </p>
+                  <p className="mt-4 text-xs text-maersk-slate/80">Updated {formatDate(project.updatedAt)}</p>
+                </Card>
               </Link>
             </li>
           ))}

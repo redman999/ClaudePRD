@@ -130,7 +130,9 @@
         "id": "U3-S1",
         "title": "Home (project list) redesign",
         "description": "Rebuild apps/web/src/pages/Home.tsx using Card/Badge/Button and a responsive grid of project cards (name, truncated description, session-count badge, last-updated). Maersk-styled 'New Project' primary button and a polished empty state. Preserve the existing fetch + navigation behaviour.",
-        "status": "todo",
+        "status": "done",
+        "completed": "2026-06-12",
+        "completion_notes": "Rebuilt Home.tsx project list into a responsive grid (grid-cols-1 sm:grid-cols-2 lg:grid-cols-3, gap-5) of Maersk Card primitives wrapped in Link (whole card clickable; group-hover lifts border->maersk-blue + shadow-md). Each card shows the project name (truncated, ink), a blue session-count Badge (n session/sessions), the truncated description (slate, flex-1 so footers align), and 'Updated <date>'. Replaced the ad-hoc rounded-full session pill with <Badge color=blue> and the bespoke card div with <Card padded=false>. Loading skeletons + EmptyState now sit in the same grid; existing apiFetch('/api/projects') fetch and 'New Project' -> /new navigation (header Button + empty-state Button) unchanged. check (web) + build (web) + repo-root test (12 api + 11 web) all green.",
         "acceptance_criteria": [
           "Home renders a responsive grid of Maersk-styled project cards using the ui primitives",
           "Existing project fetch + 'New Project' navigation still work",
