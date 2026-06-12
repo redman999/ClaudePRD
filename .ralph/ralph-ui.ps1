@@ -1,8 +1,8 @@
 <#
-  ralph-ui.ps1 — Windows PowerShell Ralph runner for the Maersk Design UI refresh.
+  ralph-ui.ps1 - Windows PowerShell Ralph runner for the Maersk Design UI refresh.
 
   Drives the FRONTEND-ONLY refresh backlog (.ralph/prd-ui-maersk.json) and logs to
-  .ralph/progress-ui.txt — fully separate from the v1 record (.ralph/prd.json) and the
+  .ralph/progress-ui.txt - fully separate from the v1 record (.ralph/prd.json) and the
   v2 enterprise backlog (on the v2-enterprise branch). Intended to run on the `ui-maersk`
   branch, which keeps the current anonymous (no-auth) app exactly as it is.
 
@@ -27,7 +27,7 @@ study ./$prd and ./.ralph/loop.md
 
 CONTEXT: This is the Maersk Design UI refresh track. It is FRONTEND-ONLY (apps/web). You MUST NOT
 change the API (apps/api), the Prisma schema, the contracts package, or the anonymous share-link /
-name+role flow. This is a Tailwind REPLICA of Maersk Design — do NOT add @maersk-global / MDS npm
+name+role flow. This is a Tailwind REPLICA of Maersk Design - do NOT add @maersk-global / MDS npm
 packages (they are not on a reachable registry and will not build on Railway). Use the existing
 Tailwind + React + Vite stack and the Maersk palette: Maersk Blue #42b0d5, deep blue #00a3e0,
 steel #b0c4d8, slate #6b7b8d, amber #f0b429; Inter (UI) + Fira Code (mono).
@@ -41,15 +41,15 @@ steel #b0c4d8, slate #6b7b8d, amber #f0b429; Inter (UI) + Fira Code (mono).
 
 3. Verify: run 'npm run check' and 'npm run build' for the web workspace and 'npm run test' at the
    repo root. For [MANUAL] visual criteria you cannot verify headlessly, record them as SKIP with a
-   one-line note (a human will eyeball them) — do NOT fail the story on a [MANUAL] line, but DO make
+   one-line note (a human will eyeball them) - do NOT fail the story on a [MANUAL] line, but DO make
    the change the criterion describes. All non-[MANUAL] criteria must genuinely pass.
 
-4. Update ./${prd} — mark the story status "done", add a "completed" date and a "completion_notes" string.
+4. Update ./${prd} - mark the story status "done", add a "completed" date and a "completion_notes" string.
 
 5. Append a structured iteration report to ./$log (header line with timestamp + story id + status; a
    CRITERIA block with PASS/FAIL/SKIP per criterion; a NOTES paragraph). Create the file if absent.
 
-6. Make ONE git commit starting with the story id (e.g. "U1-S1 — Maersk Tailwind tokens"). Never use
+6. Make ONE git commit starting with the story id (e.g. "U1-S1 - Maersk Tailwind tokens"). Never use
    --no-verify.
 
 ONLY WORK ON A SINGLE STORY.
@@ -78,6 +78,6 @@ for ($i = 1; $i -le $Iterations; $i++) {
   Write-Host $result
   Write-Host ""
 
-  if ($result -match "<PROMISE>NEED_PERMISSIONS</PROMISE>") { Write-Host "Needs permissions — stopping."; exit 1 }
+  if ($result -match "<PROMISE>NEED_PERMISSIONS</PROMISE>") { Write-Host "Needs permissions - stopping."; exit 1 }
   if ($result -match "<PROMISE>COMPLETE</PROMISE>")        { Write-Host "UI refresh backlog complete."; exit 0 }
 }
