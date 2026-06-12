@@ -126,3 +126,15 @@ CRITERIA:
   [PASS] npm run test exits 0 — 12 api + 11 web tests pass.
 NOTES: Rebuilt ProjectDashboard.tsx on the Maersk primitives. Header block: name (ink) + topic as a blue Badge + slate description. Share-link panel is a Card with the URL in a font-mono maersk-surface code box and a primary Button (still toggles 'Copied!' 2s); legacy indigo button removed. Sessions + PRD are sibling Cards in a responsive 2-col grid (gap-6) collapsing to one column under lg. PRD export anchors restyled to a Maersk secondary-button look (steel border, hover maersk-surface) keeping the /export/markdown and /export/ralph download hrefs and the prdMarkdown gate. Loading -> shared Skeleton (steel tones); errors -> dismissable ErrorBanner. All data behaviour (fetch, polling + cleanup, copy, SessionList onDelete) unchanged. SessionList/PrdPreview internals deferred to U3-S6.
 ------------------------------------------------------------
+------------------------------------------------------------
+[2026-06-12 12:05] STORY U3-S5 — ChatSession interview UI redesign
+STATUS: DONE
+CRITERIA:
+  [PASS] Chat bubbles, coverage bars, quick replies, typing indicator and completion overlay are Maersk-styled — user bubble bg-maersk-blue/white; assistant bubble = white Card surface + shadow-mds with a /pmark.svg avatar; coverage = steel/40 track + maersk-blue fill (green when covered); chips on primary-50/maersk-blue; typing dots bg-maersk-slate; overlay rebuilt as a Maersk Card with a primary Button.
+  [PASS] Auto-start, send/typing, coverage, quick-reply and completion behaviour are unchanged — sendMessage('__START__') auto-start, optimistic user append + rollback, coverage/quickReplies state, discard-and-restart DELETE, and completion overlay trigger all preserved verbatim.
+  [SKIP] [MANUAL] Chat is usable and clean at 375px and desktop — header/coverage grid (grid-cols-2 sm:grid-cols-4) and max-w-2xl column collapse responsively; human to eyeball.
+  [PASS] npm run check (web) exits 0 — tsc --noEmit clean.
+  [PASS] npm run build (web) succeeds — vite build OK in 2.00s.
+  [PASS] npm run test exits 0 — 12 api + 11 web tests pass.
+NOTES: Rebuilt ChatSession.tsx markup on the Maersk primitives/tokens (Badge, Button, Card, Input, Spinner, ErrorBanner, cn). Reusable AssistantAvatar puts the /pmark.svg logo on a maersk-blue rounded square. Header is a white surface with the border-t-4 maersk-blue accent + steel bottom border, eyebrow in maersk-blue, guided tag as Badge color=blue, complete tag as Badge color=green, and a focus-ringed 'Discard & start over'. Coverage bars: steel/40 track, maersk-blue fill flipping to green at score>=2. Input row = Input primitive + primary Button (disabled empty/sending); send errors via dismissable ErrorBanner. Loading uses the Spinner primitive; load-error a centered Card. All interview logic untouched.
+------------------------------------------------------------
