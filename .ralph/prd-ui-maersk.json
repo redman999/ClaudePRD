@@ -74,7 +74,7 @@
   {
     "id": "U2",
     "name": "Phase U2 — App shell, navigation & global states",
-    "status": "active",
+    "status": "done",
     "goal": "Redesign the app frame: a Maersk-style header/navbar, a consistent page shell/container, and standardized loading/empty/error states using the new primitives.",
     "stories": [
       {
@@ -102,7 +102,9 @@
         "id": "U2-S2",
         "title": "Standardize loading skeletons, empty states, and error banners",
         "description": "Create apps/web/src/components/feedback/{Skeleton,EmptyState,ErrorBanner}.tsx in Maersk style (steel/slate tones, Maersk Blue accents) and a small Toast/inline-status pattern. These replace the ad-hoc gray boxes and raw error text currently used across pages. Do not rewire every page here — just provide the components and use them on at least one page (Home) as the reference implementation.",
-        "status": "todo",
+        "status": "done",
+        "completed": "2026-06-12",
+        "completion_notes": "Added apps/web/src/components/feedback/ with Maersk-styled global state components: Skeleton + SkeletonCard (pulsing steel/40 placeholders matching the project-card layout), EmptyState (dashed steel border, ink title, slate description, optional icon + action slot), ErrorBanner (role=alert, clean red surface, rounded-mds edge, optional dismiss with Maersk Blue focus ring) and InlineStatus (the small inline-status pattern: role=status aria-live=polite, busy tone shows the Maersk Blue Spinner). Barrel index.ts exports all four. Home.tsx rewired as the reference implementation: replaced its local gray Skeleton with <SkeletonCard/> x3, the raw red error div with <ErrorBanner onDismiss>, and the ad-hoc empty paragraph with <EmptyState> + a primary Button CTA; project rows + session pill restyled to Maersk tokens (maersk-ink/slate, primary-50/700, hover:border-maersk-blue). feedback.test.tsx mounts EmptyState, ErrorBanner, SkeletonCard and InlineStatus via renderToStaticMarkup (no jsdom dep, matching ui.test pattern): 4 tests pass. check (web) + build (web) + repo-root test (12 api + 11 web) all green.",
         "acceptance_criteria": [
           "Skeleton, EmptyState, ErrorBanner components exist and are used on Home",
           "Render test mounts EmptyState and ErrorBanner",
@@ -121,7 +123,7 @@
   {
     "id": "U3",
     "name": "Phase U3 — Page redesigns (Maersk look + layout)",
-    "status": "pending",
+    "status": "active",
     "goal": "Restyle and re-layout every page using the new tokens, primitives, and shell. Behaviour and data flow stay identical; only presentation/layout changes. Anonymous join (name+role+mode) is preserved.",
     "stories": [
       {
