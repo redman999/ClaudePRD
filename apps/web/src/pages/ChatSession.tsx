@@ -316,6 +316,7 @@ export default function ChatSession() {
                   value={input}
                   onChange={e => setInput(e.target.value)}
                   disabled={sending}
+                  aria-label="Your response"
                   placeholder={sending ? 'Claude is thinking…' : 'Type your response…'}
                   className="flex-1"
                 />

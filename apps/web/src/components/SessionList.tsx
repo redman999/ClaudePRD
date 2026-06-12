@@ -76,7 +76,7 @@ export default function SessionList({ sessions, onDelete }: Props) {
                     onClick={(e) => handleDelete(e, s)}
                     aria-label={`Discard ${s.name}'s interview`}
                     title="Discard this interview"
-                    className="rounded px-1 text-xs text-maersk-slate transition-colors hover:text-red-600"
+                    className="inline-flex h-7 w-7 items-center justify-center rounded text-sm text-maersk-slate transition-colors hover:text-red-600"
                   >
                     ✕
                   </button>
