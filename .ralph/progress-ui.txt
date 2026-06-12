@@ -138,3 +138,14 @@ CRITERIA:
   [PASS] npm run test exits 0 — 12 api + 11 web tests pass.
 NOTES: Rebuilt ChatSession.tsx markup on the Maersk primitives/tokens (Badge, Button, Card, Input, Spinner, ErrorBanner, cn). Reusable AssistantAvatar puts the /pmark.svg logo on a maersk-blue rounded square. Header is a white surface with the border-t-4 maersk-blue accent + steel bottom border, eyebrow in maersk-blue, guided tag as Badge color=blue, complete tag as Badge color=green, and a focus-ringed 'Discard & start over'. Coverage bars: steel/40 track, maersk-blue fill flipping to green at score>=2. Input row = Input primitive + primary Button (disabled empty/sending); send errors via dismissable ErrorBanner. Loading uses the Spinner primitive; load-error a centered Card. All interview logic untouched.
 ------------------------------------------------------------
+------------------------------------------------------------
+[2026-06-12 12:21] STORY U3-S6 — Restyle SessionList + PrdPreview (markdown typography)
+STATUS: DONE
+CRITERIA:
+  [PASS] SessionList uses Maersk Badges + rows; PrdPreview renders markdown with Maersk typography (code in Fira Code) — SessionList rows are white/steel-bordered cards (hover->maersk-blue) with <Badge green=Complete / amber=Active>; PrdPreview maps react-markdown elements to Inter ink headings, steel rules, and Fira Code (font-mono) for inline + fenced code
+  [PASS] react-markdown rendering + empty-state preserved — PrdPreview still renders via <ReactMarkdown> (now with a components map) and keeps the "PRD will appear here…" placeholder; SessionList keeps its "No sessions yet…" empty state and Link/onDelete behaviour
+  [PASS] npm run check (web) exits 0 — tsc --noEmit clean
+  [PASS] npm run build (web) succeeds — vite build, 223 modules, dist emitted
+  [PASS] npm run test exits 0 — api 12/12 + web 11/11 passed
+NOTES: Final U3 page-redesign story. SessionList.tsx moved off gray utilities onto Maersk tokens + the Badge primitive: rows are white cards (border-maersk-steel/40, rounded-mds) that highlight to border-maersk-blue + bg-primary-50 on hover (group), name in maersk-ink, role/relative-time in maersk-slate, status as green/amber Badges, discard ✕ recolored slate->red-600. PrdPreview.tsx rebuilt with a typed react-markdown `components` map (offline-safe; NO @tailwindcss/typography dependency added) delivering Maersk "prose" typography — Inter ink headings with steel-rule underlines (h1/h2), readable measure (max-w-prose), slate list markers, primary-700 links, a Maersk Blue blockquote, steel <hr>, bordered tables, inline code on a maersk-surface chip, and fenced code blocks in Fira Code on a maersk-ink panel. Behaviour preserved verbatim. Phase U3 now complete (all 6 stories done) -> phase U3 set "done", phase U4 set "active". Frontend-only; API/contracts/schema/anonymous flow untouched.
+------------------------------------------------------------

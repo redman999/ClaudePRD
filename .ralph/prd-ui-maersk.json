@@ -123,7 +123,7 @@
   {
     "id": "U3",
     "name": "Phase U3 — Page redesigns (Maersk look + layout)",
-    "status": "active",
+    "status": "done",
     "goal": "Restyle and re-layout every page using the new tokens, primitives, and shell. Behaviour and data flow stay identical; only presentation/layout changes. Anonymous join (name+role+mode) is preserved.",
     "stories": [
       {
@@ -222,7 +222,9 @@
         "id": "U3-S6",
         "title": "Restyle SessionList + PrdPreview (markdown typography)",
         "description": "Restyle apps/web/src/components/SessionList.tsx (Maersk rows + status Badges + relative time) and apps/web/src/components/PrdPreview.tsx (Maersk 'prose'-style markdown: Inter headings, readable measure, steel rules, Fira Code for code blocks). Preserve react-markdown rendering and the empty-state placeholder.",
-        "status": "todo",
+        "status": "done",
+        "completed": "2026-06-12",
+        "completion_notes": "Restyled SessionList.tsx onto Maersk tokens + the Badge primitive: rows are now white cards with a steel/40 border and rounded-mds edge that highlight to border-maersk-blue + bg-primary-50 on hover (group), name in maersk-ink / role + relative time in maersk-slate; status uses <Badge color=green>Complete / <Badge color=amber>Active and the discard ✕ moved off gray to maersk-slate->red-600. The summary line + empty-state placeholder are preserved (recolored to maersk-slate). relativeTime, the Link-to-/session navigation, and the onDelete/window.confirm discard behaviour are unchanged. Rebuilt PrdPreview.tsx with a typed react-markdown `components` map (offline-safe — no @tailwindcss/typography dep added) giving Maersk 'prose' typography: Inter ink headings with steel rule underlines on h1/h2, readable measure (max-w-prose), slate-marker lists, primary-700 links, a Maersk Blue blockquote, steel <hr>, bordered tables, inline code on a maersk-surface chip and fenced code blocks in Fira Code on a maersk-ink panel (font-mono). react-markdown rendering + the empty-state placeholder are preserved. check (web) exits 0 + build (web) succeeds + repo-root test (12 api + 11 web) all green.",
         "acceptance_criteria": [
           "SessionList uses Maersk Badges + rows; PrdPreview renders markdown with Maersk typography (code in Fira Code)",
           "react-markdown rendering + empty-state preserved",
@@ -240,7 +242,7 @@
   {
     "id": "U4",
     "name": "Phase U4 — Responsive, accessibility & deploy polish",
-    "status": "pending",
+    "status": "active",
     "goal": "Final consistency sweep: responsiveness at 375px, accessible focus/contrast, a consistency audit, and confirmation the build is Railway-ready via the existing pipeline.",
     "stories": [
       {
