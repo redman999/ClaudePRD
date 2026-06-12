@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { apiFetch } from '../lib/api'
+import { Button, Card, Input, Label, Textarea } from '../ui'
+import { ErrorBanner } from '../components/feedback'
 
 interface FormValues {
   name: string
@@ -76,77 +78,94 @@ export default function NewProject() {
 
   return (
     <div className="mx-auto max-w-2xl">
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">New Project</h1>
+      <h1 className="mb-1 text-2xl font-bold text-maersk-ink">New Project</h1>
+      <p className="mb-6 text-sm text-maersk-slate">
+        Set up a project, then share its link with stakeholders to gather their input.
+      </p>
 
-        {apiError && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6 text-sm">
-            {apiError}
-          </div>
-        )}
+      {apiError && (
+        <ErrorBanner onDismiss={() => setApiError(null)} className="mb-6">
+          {apiError}
+        </ErrorBanner>
+      )}
 
-        <form onSubmit={handleSubmit} noValidate className="bg-white border border-gray-200 rounded-xl p-6 space-y-5">
+      <Card>
+        <form onSubmit={handleSubmit} noValidate className="space-y-5">
           <div>
-            <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
-              Project Name <span className="text-red-500">*</span>
-            </label>
-            <input
+            <Label htmlFor="name" required>
+              Project Name
+            </Label>
+            <Input
               id="name"
               name="name"
               type="text"
               value={values.name}
               onChange={handleChange}
               disabled={submitting}
+              error={!!errors.name}
               placeholder="e.g. Customer Portal Redesign"
-              className={`w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:bg-gray-50 ${
-                errors.name ? 'border-red-400' : 'border-gray-300'
-              }`}
+              aria-invalid={!!errors.name}
+              aria-describedby={errors.name ? 'name-error' : undefined}
             />
-            {errors.name && <p className="text-red-600 text-xs mt-1">{errors.name}</p>}
+            {errors.name && (
+              <p id="name-error" className="mt-1 text-xs text-red-600">
+                {errors.name}
+              </p>
+            )}
           </div>
 
           <div>
-            <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
-              Description <span className="text-red-500">*</span>
-            </label>
-            <textarea
+            <Label htmlFor="description" required>
+              Description
+            </Label>
+            <Textarea
               id="description"
               name="description"
               value={values.description}
               onChange={handleChange}
               disabled={submitting}
+              error={!!errors.description}
               rows={4}
               placeholder="What is this project about? What problem does it solve?"
-              className={`w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:bg-gray-50 resize-none ${
-                errors.description ? 'border-red-400' : 'border-gray-300'
-              }`}
+              aria-invalid={!!errors.description}
+              aria-describedby={errors.description ? 'description-error' : undefined}
             />
-            {errors.description && <p className="text-red-600 text-xs mt-1">{errors.description}</p>}
+            {errors.description && (
+              <p id="description-error" className="mt-1 text-xs text-red-600">
+                {errors.description}
+              </p>
+            )}
           </div>
 
           <div>
-            <label htmlFor="topic" className="block text-sm font-medium text-gray-700 mb-1">
-              Topic / Focus Area <span className="text-red-500">*</span>
-            </label>
-            <input
+            <Label htmlFor="topic" required>
+              Topic / Focus Area
+            </Label>
+            <Input
               id="topic"
               name="topic"
               type="text"
               value={values.topic}
               onChange={handleChange}
               disabled={submitting}
+              error={!!errors.topic}
               placeholder="e.g. Enterprise SaaS, Mobile App, Internal Tool"
-              className={`w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:bg-gray-50 ${
-                errors.topic ? 'border-red-400' : 'border-gray-300'
-              }`}
+              aria-invalid={!!errors.topic}
+              aria-describedby={errors.topic ? 'topic-error' : undefined}
             />
-            {errors.topic && <p className="text-red-600 text-xs mt-1">{errors.topic}</p>}
+            {errors.topic && (
+              <p id="topic-error" className="mt-1 text-xs text-red-600">
+                {errors.topic}
+              </p>
+            )}
           </div>
 
           <div>
-            <label htmlFor="targetAudience" className="block text-sm font-medium text-gray-700 mb-1">
-              Target Audience <span className="text-gray-400 font-normal">(optional)</span>
-            </label>
-            <input
+            <Label htmlFor="targetAudience">
+              Target Audience{' '}
+              <span className="font-normal text-maersk-slate">(optional)</span>
+            </Label>
+            <Input
               id="targetAudience"
               name="targetAudience"
               type="text"
@@ -154,30 +173,16 @@ export default function NewProject() {
               onChange={handleChange}
               disabled={submitting}
               placeholder="e.g. Small business owners, Enterprise IT teams"
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:bg-gray-50"
             />
           </div>
 
           <div className="pt-2">
-            <button
-              type="submit"
-              disabled={submitting}
-              className="w-full bg-indigo-600 text-white px-4 py-2.5 rounded-lg font-medium hover:bg-indigo-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-            >
-              {submitting ? (
-                <>
-                  <svg className="animate-spin h-4 w-4 text-white" viewBox="0 0 24 24" fill="none">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
-                  </svg>
-                  Creating…
-                </>
-              ) : (
-                'Create Project'
-              )}
-            </button>
+            <Button type="submit" loading={submitting} className="w-full">
+              {submitting ? 'Creating…' : 'Create Project'}
+            </Button>
           </div>
         </form>
+      </Card>
     </div>
   )
 }

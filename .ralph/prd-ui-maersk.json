@@ -149,7 +149,9 @@
         "id": "U3-S2",
         "title": "NewProject form redesign",
         "description": "Restyle apps/web/src/pages/NewProject.tsx with the Input/Textarea/Label/Button primitives, a Card-wrapped form, Maersk Blue focus rings, and inline validation styling. Preserve client-side validation, the template/topic fields, the POST, and redirect behaviour.",
-        "status": "todo",
+        "status": "done",
+        "completed": "2026-06-12",
+        "completion_notes": "Rewrote NewProject.tsx markup onto the Maersk primitives — form fields now use Label (with required amber marker) + Input/Textarea (steel border, Maersk Blue focus ring, error prop), the whole form wrapped in a Card, and the submit uses the primary Button with its built-in loading spinner (loading={submitting}). The legacy indigo focus ring / hand-rolled spinner / raw gray inputs are gone. API errors now render via the shared ErrorBanner (dismissable) instead of the ad-hoc red div. Added aria-invalid / aria-describedby wiring to each errored field for a11y. All behaviour preserved verbatim: FormValues/FormErrors, validate(), handleChange clearing, handleSubmit (trim, optional targetAudience, POST /api/projects, navigate to /projects/:id), and submitting state. Added a short slate subtitle under the heading. check (web) + build (web) + repo-root test (12 api + 11 web) all green.",
         "acceptance_criteria": [
           "Form uses the Maersk Input/Button primitives and Card layout; validation + submit + redirect unchanged",
           "[MANUAL] Form reads as a Maersk form (labels, focus rings, spacing)",

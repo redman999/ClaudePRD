@@ -79,3 +79,21 @@ CRITERIA:
   [PASS] npm run test exits 0 — api 12/12 + web 11/11 passed
 NOTES: Rebuilt the Home project list from a single-column ad-hoc <ul space-y-4> into a responsive card grid (grid-cols-1 sm:grid-cols-2 lg:grid-cols-3, gap-5). Each project is now a <Link> wrapping the Maersk <Card> primitive (padded=false, p-5, flex flex-col h-full) so cards are equal-height and the whole card is clickable; group-hover lifts the border to maersk-blue and adds shadow-md, and the Link carries rounded-mds + focus-visible:outline-none (Card keeps the focus story simple while the global focus-visible ring still applies). The bespoke rounded-full session pill was replaced by <Badge color="blue">, and the bespoke card <div> by <Card>. Header (title + sm primary 'New Project' Button), ErrorBanner, and the EmptyState (with its primary Button CTA) are unchanged; only the loaded/loading list markup moved into the grid. Imports now pull Badge + Card from ../ui alongside Button. No API, schema, contracts, or share-link/name+role flow touched — frontend-only, single output file (Home.tsx).
 ------------------------------------------------------------
+------------------------------------------------------------
+[2026-06-12 11:58] STORY U3-S2 — NewProject form redesign
+STATUS: DONE
+CRITERIA:
+  [PASS] Form uses the Maersk Input/Button primitives and Card layout; validation + submit + redirect unchanged — Label/Input/Textarea/Button/Card from ../ui; validate(), handleSubmit POST /api/projects + navigate(/projects/:id) preserved verbatim.
+  [SKIP] [MANUAL] Form reads as a Maersk form (labels, focus rings, spacing) — human eyeball; change made: steel-bordered fields, Maersk Blue focus ring (primitive), required amber markers, Card wrap, slate subtitle.
+  [PASS] npm run check (web) exits 0 — tsc --noEmit clean.
+  [PASS] npm run build (web) succeeds — vite built in ~2s, dist emitted.
+  [PASS] npm run test exits 0 — 12 api + 11 web tests pass.
+NOTES: Swapped NewProject.tsx markup onto the Maersk UI primitives with zero behavioural change.
+  Fields use Label (required amber marker) + Input/Textarea (error prop -> red border, otherwise
+  steel border + Maersk Blue focus ring); the form is Card-wrapped; submit is the primary Button
+  with its built-in loading spinner. API errors render through the shared dismissable ErrorBanner
+  instead of the old ad-hoc red div, and each errored field gets aria-invalid/aria-describedby.
+  Legacy indigo focus ring, hand-rolled SVG spinner, and raw gray inputs removed. Form state
+  (FormValues/FormErrors), validate(), handleChange clearing, trim + optional targetAudience, the
+  POST, and redirect are all unchanged.
+------------------------------------------------------------
