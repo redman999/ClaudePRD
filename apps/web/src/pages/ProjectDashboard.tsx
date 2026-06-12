@@ -3,6 +3,8 @@ import { useParams } from 'react-router-dom'
 import SessionList from '../components/SessionList'
 import PrdPreview from '../components/PrdPreview'
 import { apiFetch } from '../lib/api'
+import { Badge, Button, Card } from '../ui'
+import { ErrorBanner, Skeleton } from '../components/feedback'
 
 interface Session {
   id: string
@@ -24,12 +26,12 @@ interface Project {
   sessions: Session[]
 }
 
-function Skeleton() {
+function DashboardSkeleton() {
   return (
-    <div className="animate-pulse space-y-4">
-      <div className="h-7 bg-gray-200 rounded w-1/3" />
-      <div className="h-4 bg-gray-100 rounded w-2/3" />
-      <div className="h-4 bg-gray-100 rounded w-1/2" />
+    <div className="space-y-4" aria-hidden="true">
+      <Skeleton className="h-8 w-1/3" />
+      <Skeleton className="h-4 w-2/3 bg-maersk-steel/30" />
+      <Skeleton className="h-4 w-1/2 bg-maersk-steel/30" />
     </div>
   )
 }
@@ -88,46 +90,55 @@ export default function ProjectDashboard() {
     })
   }
 
+  const exportLinkClass =
+    'inline-flex items-center rounded-mds border border-maersk-steel bg-white px-3 py-1.5 ' +
+    'text-sm font-medium text-maersk-ink transition-colors hover:bg-maersk-surface ' +
+    'active:bg-primary-50 focus-visible:outline-none'
+
   return (
     <>
-      {loading && <Skeleton />}
+      {loading && <DashboardSkeleton />}
 
-        {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
-            {error}
-          </div>
-        )}
+      {error && (
+        <ErrorBanner className="mb-6" onDismiss={() => setError(null)}>
+          {error}
+        </ErrorBanner>
+      )}
 
-        {project && (
-          <div className="space-y-8">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">{project.name}</h1>
-              <p className="text-gray-600 mt-2">{project.description}</p>
-              <p className="text-sm text-gray-500 mt-1">
-                <span className="font-medium text-gray-700">Topic:</span> {project.topic}
-              </p>
+      {project && (
+        <div className="space-y-8">
+          {/* Header block */}
+          <header>
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <h1 className="min-w-0 text-2xl font-semibold text-maersk-ink">{project.name}</h1>
+              <Badge color="blue" className="shrink-0">{project.topic}</Badge>
             </div>
+            <p className="mt-2 max-w-2xl text-maersk-slate">{project.description}</p>
+          </header>
 
-            <div className="bg-white border border-gray-200 rounded-xl p-5">
-              <h2 className="text-base font-semibold text-gray-900 mb-3">Share Link</h2>
-              <p className="text-sm text-gray-600 mb-3">
-                Send this link to stakeholders so they can join the interview.
-              </p>
-              <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
-                <code className="flex-1 min-w-0 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-800 truncate">
-                  {`${window.location.origin}/join/${project.shareToken}`}
-                </code>
-                <button
-                  onClick={handleCopy}
-                  className="shrink-0 bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700 transition-colors"
-                >
-                  {copied ? 'Copied!' : 'Copy'}
-                </button>
-              </div>
+          {/* Share link */}
+          <Card header="Share link">
+            <p className="mb-3 text-sm text-maersk-slate">
+              Send this link to stakeholders so they can join the interview.
+            </p>
+            <div className="flex flex-wrap items-center gap-2 sm:flex-nowrap">
+              <code className="min-w-0 flex-1 truncate rounded-mds border border-maersk-steel/50 bg-maersk-surface px-3 py-2 font-mono text-sm text-maersk-ink">
+                {`${window.location.origin}/join/${project.shareToken}`}
+              </code>
+              <Button
+                variant="primary"
+                size="sm"
+                onClick={handleCopy}
+                className="shrink-0"
+              >
+                {copied ? 'Copied!' : 'Copy'}
+              </Button>
             </div>
+          </Card>
 
-            <div className="bg-white border border-gray-200 rounded-xl p-5">
-              <h2 className="text-base font-semibold text-gray-900 mb-3">Sessions</h2>
+          {/* Two-column responsive layout: sessions + PRD */}
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+            <Card header="Sessions">
               <SessionList
                 sessions={project.sessions}
                 onDelete={async (sessionId) => {
@@ -139,34 +150,38 @@ export default function ProjectDashboard() {
                   }
                 }}
               />
-            </div>
+            </Card>
 
-            <div className="bg-white border border-gray-200 rounded-xl p-5">
-              <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
-                <h2 className="text-base font-semibold text-gray-900">PRD</h2>
-                {project.prdMarkdown && (
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <a
-                      href={`/api/projects/${project.id}/export/markdown`}
-                      download
-                      className="text-sm font-medium text-indigo-600 hover:text-indigo-800 border border-indigo-200 hover:border-indigo-400 px-3 py-1.5 rounded-lg transition-colors"
-                    >
-                      Download PRD (.md)
-                    </a>
-                    <a
-                      href={`/api/projects/${project.id}/export/ralph`}
-                      download
-                      className="text-sm font-medium text-indigo-600 hover:text-indigo-800 border border-indigo-200 hover:border-indigo-400 px-3 py-1.5 rounded-lg transition-colors"
-                    >
-                      Download prd.json (ralph)
-                    </a>
-                  </div>
-                )}
-              </div>
+            <Card
+              header={
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <h2 className="text-base font-semibold text-maersk-ink">PRD</h2>
+                  {project.prdMarkdown && (
+                    <div className="flex flex-wrap items-center gap-2">
+                      <a
+                        href={`/api/projects/${project.id}/export/markdown`}
+                        download
+                        className={exportLinkClass}
+                      >
+                        Download PRD (.md)
+                      </a>
+                      <a
+                        href={`/api/projects/${project.id}/export/ralph`}
+                        download
+                        className={exportLinkClass}
+                      >
+                        Download prd.json (ralph)
+                      </a>
+                    </div>
+                  )}
+                </div>
+              }
+            >
               <PrdPreview markdown={project.prdMarkdown ?? ''} />
-            </div>
+            </Card>
           </div>
-        )}
+        </div>
+      )}
     </>
   )
 }

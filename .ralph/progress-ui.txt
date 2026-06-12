@@ -115,3 +115,14 @@ NOTES: Restyled JoinSession.tsx to Maersk Design. Header now pairs the /pmark.sv
        state is a centered Maersk Card; api errors render via the dismissable ErrorBanner. No API,
        schema, contracts, or share-link/name+role flow touched.
 ------------------------------------------------------------
+------------------------------------------------------------
+[2026-06-12 12:02] STORY U3-S4 — ProjectDashboard redesign + responsive 2-column layout
+STATUS: DONE
+CRITERIA:
+  [PASS] Dashboard uses a responsive 2-col layout with Maersk styling; polling, copy link, and export still work — sessions + PRD in grid-cols-1 lg:grid-cols-2; fetchProject/10s startPolling, clipboard handleCopy, and export hrefs all preserved verbatim.
+  [SKIP] [MANUAL] Collapses cleanly to a single column at 375px — grid-cols-1 lg:grid-cols-2 is single-column below the lg breakpoint; human to eyeball.
+  [PASS] npm run check (web) exits 0 — tsc --noEmit clean.
+  [PASS] npm run build (web) succeeds — vite build OK (223 modules).
+  [PASS] npm run test exits 0 — 12 api + 11 web tests pass.
+NOTES: Rebuilt ProjectDashboard.tsx on the Maersk primitives. Header block: name (ink) + topic as a blue Badge + slate description. Share-link panel is a Card with the URL in a font-mono maersk-surface code box and a primary Button (still toggles 'Copied!' 2s); legacy indigo button removed. Sessions + PRD are sibling Cards in a responsive 2-col grid (gap-6) collapsing to one column under lg. PRD export anchors restyled to a Maersk secondary-button look (steel border, hover maersk-surface) keeping the /export/markdown and /export/ralph download hrefs and the prdMarkdown gate. Loading -> shared Skeleton (steel tones); errors -> dismissable ErrorBanner. All data behaviour (fetch, polling + cleanup, copy, SessionList onDelete) unchanged. SessionList/PrdPreview internals deferred to U3-S6.
+------------------------------------------------------------

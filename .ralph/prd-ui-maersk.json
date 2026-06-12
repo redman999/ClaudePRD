@@ -185,7 +185,9 @@
         "id": "U3-S4",
         "title": "ProjectDashboard redesign + responsive 2-column layout",
         "description": "Rebuild apps/web/src/pages/ProjectDashboard.tsx layout: a Maersk header block (name/description/topic), the share-link + copy control restyled, a two-column responsive layout (sessions list + PRD preview), Maersk-styled export buttons, and use of SessionList/PrdPreview. Preserve polling, copy-to-clipboard, export hrefs, and all data behaviour.",
-        "status": "todo",
+        "status": "done",
+        "completed": "2026-06-12",
+        "completion_notes": "Rebuilt ProjectDashboard.tsx onto the Maersk primitives. Header block now shows the project name (ink, 2xl) with the topic as a blue Badge and the description in slate. The share-link panel is a Card (header='Share link') with the URL in a font-mono maersk-surface code box and a primary Button copy control (still toggles 'Copied!' for 2s) — the legacy indigo button is gone. Sessions + PRD now sit in a responsive grid (grid-cols-1 lg:grid-cols-2, gap-6) that collapses to one column under lg; each is a Card with a header. PRD export anchors restyled to a Maersk secondary-button look (steel border, hover maersk-surface) while keeping the download hrefs (/export/markdown, /export/ralph) and the prdMarkdown gate verbatim. Loading state uses the shared Skeleton (steel tones) and errors render via the dismissable ErrorBanner. All behaviour preserved: fetchProject, 10s startPolling, clipboard handleCopy, SessionList onDelete, and the polling cleanup effect are unchanged. SessionList/PrdPreview internals left for U3-S6. check (web) + build (web) + repo-root test (12 api + 11 web) all green.",
         "acceptance_criteria": [
           "Dashboard uses a responsive 2-col layout with Maersk styling; polling, copy link, and export still work",
           "[MANUAL] Collapses cleanly to a single column at 375px",
