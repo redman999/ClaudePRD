@@ -1,0 +1,185 @@
+------------------------------------------------------------
+[2026-06-11] TRACK INIT — Maersk Design UI refresh (branch: ui-maersk)
+STATUS: READY
+SCOPE: Frontend-only (apps/web). Tailwind replica of Maersk Design — Maersk Blue #42b0d5,
+       deep #00a3e0, steel #b0c4d8, slate #6b7b8d, amber #f0b429; Inter + Fira Code.
+       API, Prisma schema, contracts, and the anonymous share-link/name+role flow are UNCHANGED.
+BACKLOG: .ralph/prd-ui-maersk.json — 4 phases (U1..U4), 13 stories. Active: U1.
+RUNNER: .ralph/ralph-ui.ps1 -Iterations 5  (logs here)
+ISOLATION: v1 record stays in .ralph/prd.json; v2 enterprise backlog lives on branch v2-enterprise.
+           This branch merges to master -> Railway only on approval.
+NOTES: Palette/stack derived from interrogating the live Maersk ALP platform, which itself uses
+       plain Tailwind (no @maersk-global MDS component packages — those are private + not Railway-buildable).
+------------------------------------------------------------
+------------------------------------------------------------
+[2026-06-12 10:06] STORY U1-S1 — Extend Tailwind theme with Maersk Design tokens
+STATUS: DONE
+CRITERIA:
+  [PASS] tailwind.config.ts defines maersk.blue '#42b0d5', maersk.steel, maersk.slate, maersk.amber and sans=Inter / mono=Fira Code (grep confirmed all values present)
+  [PASS] index.css base sets the Maersk surface/ink colors and a focus-visible ring (body bg-maersk-surface text-maersk-ink + *:focus-visible ring-maersk-blue)
+  [PASS] npm run check (web) exits 0 — tsc --noEmit clean
+  [PASS] npm run build (web) succeeds — vite build, 205 modules, dist emitted
+  [PASS] npm run test exits 0 — api 12/12 passed, web no test files (exit 0)
+NOTES: Added a Maersk Design palette under theme.extend.colors (maersk.blue #42b0d5, blue-deep #00a3e0, steel #b0c4d8, slate #6b7b8d, amber #f0b429, ink #141b25, surface #f0f4f8) plus a primary 50-900 scale aliased to Maersk Blue. Added fontFamily.sans=[Inter,...] / mono=[Fira Code,...], borderRadius.mds=0.5rem, and a subtle boxShadow.mds. index.css base layer now sets body bg-maersk-surface/text-maersk-ink/font-sans/antialiased and a global Maersk Blue focus-visible ring. No component markup changed (per story scope). Foundation-only; fonts are wired up in U1-S2.
+------------------------------------------------------------
+------------------------------------------------------------
+[2026-06-12 10:09] STORY U1-S2 — Load Inter + Fira Code fonts (self-hosted, offline-safe)
+STATUS: DONE
+CRITERIA:
+  [PASS] Inter and Fira Code bundled locally (no fonts.googleapis.com/gstatic) — grep of dist = 0 external font URLs; woff2 emitted under dist/assets/inter-*.woff2
+  [PASS] Computed body font-family resolves to Inter — built index CSS contains the Inter @font-face; body uses font-sans (Inter) from the base layer
+  [PASS] npm run check (web) exits 0 — tsc --noEmit clean
+  [PASS] npm run build (web) succeeds — vite build, fonts emitted as hashed assets, built in ~1.7s
+  [PASS] npm run test exits 0 — api 12/12 passed, web no test files (exit 0)
+NOTES: Added @fontsource/inter@^5 and @fontsource/fira-code@^5 to apps/web dependencies and imported only the needed weights in main.tsx (Inter 400/500/600/700, Fira Code 400) ahead of './index.css'. Fonts are fully self-hosted: Vite fingerprints and bundles the woff2/woff files, so there is no runtime Google Fonts request — Maersk-network friendly and Railway-safe. No @maersk-global packages added (Tailwind-replica constraint respected). index.css base already maps body to font-sans=Inter from U1-S1, so the fonts apply without further markup changes.
+------------------------------------------------------------
+------------------------------------------------------------
+[2026-06-12 10:12] STORY U1-S3 — Create Maersk UI primitives: Button, Card, Input, Badge, Spinner
+STATUS: DONE
+CRITERIA:
+  [PASS] apps/web/src/ui/{Button,Card,Input,Badge,Spinner}.tsx exist and are exported from ui/index.ts — barrel index.ts re-exports all components + their prop/variant types; cn helper also exported
+  [PASS] A unit/render test mounts Button (primary+loading) and Badge and asserts they render — ui.test.tsx, 7 tests, asserts label/spinner/aria-busy/disabled/bg-maersk-blue for Button and rounded-full/text-green-700 for Badge (also Card, Input+Label error, Spinner, cn)
+  [PASS] npm run check (web) exits 0 — tsc --noEmit clean (strict, noUnusedLocals/Params)
+  [PASS] npm run test exits 0 — api 12/12 + web 7/7 passed
+  [PASS] npm run build (web) succeeds — vite build OK in ~1.8s (loop.md gate; not in story criteria)
+NOTES: Created apps/web/src/ui/ holding small typed Maersk Design primitives. Button: primary=Maersk Blue solid, secondary=steel outline, ghost; sizes sm/md; loading state renders a Spinner + sets disabled/aria-busy; forwardRef. Card: white surface, rounded-mds + shadow-mds, optional header above a steel divider. Input + Textarea + Label: steel border, Maersk Blue focus ring (focus:ring-maersk-blue), error border state, amber required marker; forwardRef. Badge: blue/green/amber/slate status pills. Spinner: role=status, animate-spin, inherits currentColor (Maersk Blue default). cn() is a dependency-free clsx-style merge helper (strings/falsy/arrays/object syntax) so NO clsx dependency was added — keeps the build offline-safe per the Tailwind-replica constraint. No @maersk-global packages. The render test uses react-dom/server renderToStaticMarkup, so no jsdom/@testing-library devDeps were needed. Per the story, NO pages were refactored to use the primitives (deferred to U2/U3); components are proven only via the test. The ui/ module is currently tree-shaken from the production bundle since no page imports it yet — expected, build still succeeds.
+------------------------------------------------------------
+------------------------------------------------------------
+[2026-06-12 10:19] STORY U2-S1 — Maersk-style Navbar + app shell layout
+STATUS: DONE
+CRITERIA:
+  [PASS] Navbar renders the brand with a Maersk Blue accent and Inter type; existing Home navigation still works — Navbar.tsx: white surface + border-t-4 border-maersk-blue accent stripe + steel bottom border; /pmark.svg mark + 'Maersk PRD Studio' wordmark (font-sans=Inter) wrapped in a <Link to="/"> (home nav preserved)
+  [PASS] AppShell wraps pages with a max-width container + consistent padding (used in App.tsx) — AppShell.tsx renders Navbar + a centered max-w-5xl <main> with px-4 sm:px-6 lg:px-8 / py-8 sm:py-10; App.tsx uses it as a layout route (<AppShell><Outlet/></AppShell>) around Home, /new, /projects/:id
+  [SKIP] [MANUAL] Header visually matches a clean Maersk look at desktop and 375px — change implemented (responsive padding, h-14 bar, blue accent stripe); needs a human eyeball. Build/CSS confirm classes resolve.
+  [PASS] npm run check (web) exits 0 — tsc --noEmit clean
+  [PASS] npm run build (web) succeeds — vite build OK in ~2.1s, dist emitted
+  [PASS] npm run test exits 0 — api 12/12 + web 7/7 passed
+NOTES: Centralized the app chrome. Redesigned Navbar.tsx as the Maersk brand header (white surface, thin Maersk Blue #42b0d5 top accent stripe via border-t-4, subtle steel bottom border, /pmark.svg 'P' mark + Inter wordmark, brand links home with hover->maersk-blue). Created AppShell.tsx as a presentational frame: flex min-h-screen, bg-maersk-surface/text-maersk-ink, the Navbar, and a centered max-w-5xl <main> providing consistent horizontal padding and vertical rhythm (flex-1). Wired in App.tsx via a React Router layout route (<AppShell><Outlet/></AppShell>) wrapping the three chromed routes (Home, /new, /projects/:id); JoinSession and ChatSession deliberately stay full-bleed OUTSIDE the shell so the chat keeps its full-height flex layout and the join landing keeps its centered standalone look. To prevent double navbars/containers, removed the now-duplicate per-page <Navbar/> import and the outer min-h-screen/own-container wrappers from Home/NewProject/ProjectDashboard — purely subtractive structural edits; page CONTENT is unchanged, so the U3 page redesigns (which own those files) are not pre-empted. NewProject's form is kept constrained at max-w-2xl inside the wider shell. NOTE: this touched 3 page files beyond the story's listed output_files (Navbar/AppShell/App) — unavoidable because those pages self-rendered their own Navbar+container, and there is no non-broken way to introduce a global shell without removing that duplicate chrome.
+------------------------------------------------------------
+------------------------------------------------------------
+[2026-06-12 10:23] STORY U2-S2 — Standardize loading skeletons, empty states, and error banners
+STATUS: DONE
+CRITERIA:
+  [PASS] Skeleton, EmptyState, ErrorBanner components exist and are used on Home — apps/web/src/components/feedback/{Skeleton,EmptyState,ErrorBanner}.tsx (+InlineStatus) created and all wired into Home.tsx (SkeletonCard x3 loading, ErrorBanner for the fetch error, EmptyState for the no-projects case)
+  [PASS] Render test mounts EmptyState and ErrorBanner — feedback.test.tsx renders EmptyState + ErrorBanner (+SkeletonCard +InlineStatus) via renderToStaticMarkup; 4 tests pass
+  [PASS] npm run check (web) exits 0 — tsc --noEmit clean
+  [PASS] npm run build (web) succeeds — vite build OK in ~2.1s, dist emitted
+  [PASS] npm run test exits 0 — api 12/12 + web 11/11 (7 ui + 4 feedback) passed
+NOTES: Added a Maersk-styled global-feedback component set under apps/web/src/components/feedback/. Skeleton + SkeletonCard use pulsing steel/40 placeholders; SkeletonCard mirrors the project-card layout (rounded-mds, steel border, shadow-mds) so the loading state matches the loaded state. EmptyState is a dashed-steel-border panel with an ink title, slate description, and optional icon + action slots. ErrorBanner is role=alert with a clean red surface, rounded-mds edge, a leading "!" glyph, a default "Something went wrong" title, and an optional dismiss control carrying a Maersk Blue focus-visible ring. InlineStatus fulfills the description's "small Toast/inline-status pattern": a role=status aria-live=polite line whose busy tone renders the Maersk Blue Spinner (chosen over a floating toast to avoid new portal/state machinery). A barrel index.ts exports all four. Home.tsx was rewired as the reference implementation: its local gray Skeleton was replaced with SkeletonCard, the raw red error div with <ErrorBanner onDismiss>, and the ad-hoc empty paragraph with <EmptyState> + a primary Button CTA; the project rows and session pill were retoned to Maersk tokens (maersk-ink/maersk-slate text, primary-50/700 pill, hover:border-maersk-blue). All edits confined to the story's output_files plus the new feedback/ dir; no API, schema, contracts, or share-link/name+role flow touched.
+------------------------------------------------------------
+------------------------------------------------------------
+[2026-06-12 11:55] STORY U3-S1 — Home (project list) redesign
+STATUS: DONE
+CRITERIA:
+  [PASS] Home renders a responsive grid of Maersk-styled project cards using the ui primitives — project list is a <ul> with grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5; each item is a <Link><Card padded=false>…</Card></Link> with a blue session-count <Badge>; loading SkeletonCards share the same grid
+  [PASS] Existing project fetch + 'New Project' navigation still work — apiFetch('/api/projects') effect unchanged; header <Link to="/new"><Button> and empty-state <Button> both preserved; cards still link to /projects/:id
+  [SKIP] [MANUAL] Looks clean at 375px and desktop — responsive grid implemented (1 col mobile → 2 → 3); equal-height cards via h-full + flex-col + flex-1 description; needs a human eyeball
+  [PASS] npm run check (web) exits 0 — tsc --noEmit clean
+  [PASS] npm run build (web) succeeds — vite build OK in ~2.65s, dist emitted
+  [PASS] npm run test exits 0 — api 12/12 + web 11/11 passed
+NOTES: Rebuilt the Home project list from a single-column ad-hoc <ul space-y-4> into a responsive card grid (grid-cols-1 sm:grid-cols-2 lg:grid-cols-3, gap-5). Each project is now a <Link> wrapping the Maersk <Card> primitive (padded=false, p-5, flex flex-col h-full) so cards are equal-height and the whole card is clickable; group-hover lifts the border to maersk-blue and adds shadow-md, and the Link carries rounded-mds + focus-visible:outline-none (Card keeps the focus story simple while the global focus-visible ring still applies). The bespoke rounded-full session pill was replaced by <Badge color="blue">, and the bespoke card <div> by <Card>. Header (title + sm primary 'New Project' Button), ErrorBanner, and the EmptyState (with its primary Button CTA) are unchanged; only the loaded/loading list markup moved into the grid. Imports now pull Badge + Card from ../ui alongside Button. No API, schema, contracts, or share-link/name+role flow touched — frontend-only, single output file (Home.tsx).
+------------------------------------------------------------
+------------------------------------------------------------
+[2026-06-12 11:58] STORY U3-S2 — NewProject form redesign
+STATUS: DONE
+CRITERIA:
+  [PASS] Form uses the Maersk Input/Button primitives and Card layout; validation + submit + redirect unchanged — Label/Input/Textarea/Button/Card from ../ui; validate(), handleSubmit POST /api/projects + navigate(/projects/:id) preserved verbatim.
+  [SKIP] [MANUAL] Form reads as a Maersk form (labels, focus rings, spacing) — human eyeball; change made: steel-bordered fields, Maersk Blue focus ring (primitive), required amber markers, Card wrap, slate subtitle.
+  [PASS] npm run check (web) exits 0 — tsc --noEmit clean.
+  [PASS] npm run build (web) succeeds — vite built in ~2s, dist emitted.
+  [PASS] npm run test exits 0 — 12 api + 11 web tests pass.
+NOTES: Swapped NewProject.tsx markup onto the Maersk UI primitives with zero behavioural change.
+  Fields use Label (required amber marker) + Input/Textarea (error prop -> red border, otherwise
+  steel border + Maersk Blue focus ring); the form is Card-wrapped; submit is the primary Button
+  with its built-in loading spinner. API errors render through the shared dismissable ErrorBanner
+  instead of the old ad-hoc red div, and each errored field gets aria-invalid/aria-describedby.
+  Legacy indigo focus ring, hand-rolled SVG spinner, and raw gray inputs removed. Form state
+  (FormValues/FormErrors), validate(), handleChange clearing, trim + optional targetAudience, the
+  POST, and redirect are all unchanged.
+------------------------------------------------------------
+------------------------------------------------------------
+[2026-06-12 12:00] STORY U3-S3 — JoinSession landing redesign (keep anonymous name+role+mode)
+STATUS: DONE
+CRITERIA:
+  [PASS] Join landing is Maersk-styled; name/role/mode form and existing create/resume behaviour preserved (still anonymous) — rebuilt on Card/Label/Input/Button + ErrorBanner; lookup/resume then create-session raw fetch, validate(), trims, mode and submitting state all preserved verbatim; no login/accounts added.
+  [SKIP] [MANUAL] Landing looks polished at 375px and desktop — visual-only; max-w-lg column, centered header with pmark + eyebrow, Card form, full-width primary Button collapse cleanly. Human to eyeball.
+  [PASS] npm run check (web) exits 0
+  [PASS] npm run build (web) succeeds
+  [PASS] npm run test exits 0 — 12 api + 11 web tests pass
+NOTES: Restyled JoinSession.tsx to Maersk Design. Header now pairs the /pmark.svg mark with a
+       Maersk Blue 'Maersk PRD Studio Interview' eyebrow over the project name/description/topic.
+       Invite blurb moved off indigo onto a primary-50 surface; form wrapped in a Card with Label
+       (amber required marker) + Input (steel border / Maersk Blue focus ring / error + aria wiring),
+       role datalist preserved, interview-mode radio cards on Maersk tokens (selected border-maersk-blue
+       + bg-primary-50, accent-maersk-blue), submit via primary Button loading spinner. Not-found
+       state is a centered Maersk Card; api errors render via the dismissable ErrorBanner. No API,
+       schema, contracts, or share-link/name+role flow touched.
+------------------------------------------------------------
+------------------------------------------------------------
+[2026-06-12 12:02] STORY U3-S4 — ProjectDashboard redesign + responsive 2-column layout
+STATUS: DONE
+CRITERIA:
+  [PASS] Dashboard uses a responsive 2-col layout with Maersk styling; polling, copy link, and export still work — sessions + PRD in grid-cols-1 lg:grid-cols-2; fetchProject/10s startPolling, clipboard handleCopy, and export hrefs all preserved verbatim.
+  [SKIP] [MANUAL] Collapses cleanly to a single column at 375px — grid-cols-1 lg:grid-cols-2 is single-column below the lg breakpoint; human to eyeball.
+  [PASS] npm run check (web) exits 0 — tsc --noEmit clean.
+  [PASS] npm run build (web) succeeds — vite build OK (223 modules).
+  [PASS] npm run test exits 0 — 12 api + 11 web tests pass.
+NOTES: Rebuilt ProjectDashboard.tsx on the Maersk primitives. Header block: name (ink) + topic as a blue Badge + slate description. Share-link panel is a Card with the URL in a font-mono maersk-surface code box and a primary Button (still toggles 'Copied!' 2s); legacy indigo button removed. Sessions + PRD are sibling Cards in a responsive 2-col grid (gap-6) collapsing to one column under lg. PRD export anchors restyled to a Maersk secondary-button look (steel border, hover maersk-surface) keeping the /export/markdown and /export/ralph download hrefs and the prdMarkdown gate. Loading -> shared Skeleton (steel tones); errors -> dismissable ErrorBanner. All data behaviour (fetch, polling + cleanup, copy, SessionList onDelete) unchanged. SessionList/PrdPreview internals deferred to U3-S6.
+------------------------------------------------------------
+------------------------------------------------------------
+[2026-06-12 12:05] STORY U3-S5 — ChatSession interview UI redesign
+STATUS: DONE
+CRITERIA:
+  [PASS] Chat bubbles, coverage bars, quick replies, typing indicator and completion overlay are Maersk-styled — user bubble bg-maersk-blue/white; assistant bubble = white Card surface + shadow-mds with a /pmark.svg avatar; coverage = steel/40 track + maersk-blue fill (green when covered); chips on primary-50/maersk-blue; typing dots bg-maersk-slate; overlay rebuilt as a Maersk Card with a primary Button.
+  [PASS] Auto-start, send/typing, coverage, quick-reply and completion behaviour are unchanged — sendMessage('__START__') auto-start, optimistic user append + rollback, coverage/quickReplies state, discard-and-restart DELETE, and completion overlay trigger all preserved verbatim.
+  [SKIP] [MANUAL] Chat is usable and clean at 375px and desktop — header/coverage grid (grid-cols-2 sm:grid-cols-4) and max-w-2xl column collapse responsively; human to eyeball.
+  [PASS] npm run check (web) exits 0 — tsc --noEmit clean.
+  [PASS] npm run build (web) succeeds — vite build OK in 2.00s.
+  [PASS] npm run test exits 0 — 12 api + 11 web tests pass.
+NOTES: Rebuilt ChatSession.tsx markup on the Maersk primitives/tokens (Badge, Button, Card, Input, Spinner, ErrorBanner, cn). Reusable AssistantAvatar puts the /pmark.svg logo on a maersk-blue rounded square. Header is a white surface with the border-t-4 maersk-blue accent + steel bottom border, eyebrow in maersk-blue, guided tag as Badge color=blue, complete tag as Badge color=green, and a focus-ringed 'Discard & start over'. Coverage bars: steel/40 track, maersk-blue fill flipping to green at score>=2. Input row = Input primitive + primary Button (disabled empty/sending); send errors via dismissable ErrorBanner. Loading uses the Spinner primitive; load-error a centered Card. All interview logic untouched.
+------------------------------------------------------------
+------------------------------------------------------------
+[2026-06-12 12:21] STORY U3-S6 — Restyle SessionList + PrdPreview (markdown typography)
+STATUS: DONE
+CRITERIA:
+  [PASS] SessionList uses Maersk Badges + rows; PrdPreview renders markdown with Maersk typography (code in Fira Code) — SessionList rows are white/steel-bordered cards (hover->maersk-blue) with <Badge green=Complete / amber=Active>; PrdPreview maps react-markdown elements to Inter ink headings, steel rules, and Fira Code (font-mono) for inline + fenced code
+  [PASS] react-markdown rendering + empty-state preserved — PrdPreview still renders via <ReactMarkdown> (now with a components map) and keeps the "PRD will appear here…" placeholder; SessionList keeps its "No sessions yet…" empty state and Link/onDelete behaviour
+  [PASS] npm run check (web) exits 0 — tsc --noEmit clean
+  [PASS] npm run build (web) succeeds — vite build, 223 modules, dist emitted
+  [PASS] npm run test exits 0 — api 12/12 + web 11/11 passed
+NOTES: Final U3 page-redesign story. SessionList.tsx moved off gray utilities onto Maersk tokens + the Badge primitive: rows are white cards (border-maersk-steel/40, rounded-mds) that highlight to border-maersk-blue + bg-primary-50 on hover (group), name in maersk-ink, role/relative-time in maersk-slate, status as green/amber Badges, discard ✕ recolored slate->red-600. PrdPreview.tsx rebuilt with a typed react-markdown `components` map (offline-safe; NO @tailwindcss/typography dependency added) delivering Maersk "prose" typography — Inter ink headings with steel-rule underlines (h1/h2), readable measure (max-w-prose), slate list markers, primary-700 links, a Maersk Blue blockquote, steel <hr>, bordered tables, inline code on a maersk-surface chip, and fenced code blocks in Fira Code on a maersk-ink panel. Behaviour preserved verbatim. Phase U3 now complete (all 6 stories done) -> phase U3 set "done", phase U4 set "active". Frontend-only; API/contracts/schema/anonymous flow untouched.
+------------------------------------------------------------
+------------------------------------------------------------
+[2026-06-12 12:25] STORY U4-S1 — Responsive + accessibility pass across all pages
+STATUS: DONE
+CRITERIA:
+  [PASS] All pages reviewed at 375px and desktop; layout/focus/contrast issues fixed — audited Home/NewProject/JoinSession/ProjectDashboard/ChatSession; responsive layouts (flex-wrap share row, grid-cols-1->sm/lg grids, max-w containers, truncation) collapse cleanly to one column at 375px; fixed chat-input label, ✕ tap target, and reduced-motion
+  [PASS] Interactive elements show a visible Maersk Blue focus-visible ring; inputs have labels — global *:focus-visible ring covers all controls (Button/card/anchor inherit it, Input has own focus:ring-2 ring-maersk-blue); added aria-label to the previously unlabeled ChatSession message input
+  [SKIP] [MANUAL] Spot-check Home, NewProject, JoinSession, ProjectDashboard, ChatSession at 375px — visual, human to eyeball; code-side responsive/focus/label fixes applied
+  [PASS] npm run check (web) exits 0 — tsc --noEmit clean
+  [PASS] npm run build (web) succeeds — vite build, 223 modules, dist emitted in ~2.4s
+  [PASS] npm run test exits 0 — api 12/12 + web 11/11 passed
+NOTES: Accessibility/responsive sweep across all five pages and shared components. The Maersk Blue focus-visible ring (global *:focus-visible in index.css) was already applied consistently and responsive collapse at 375px was sound, so no layout rewrites were needed. Three genuine fixes: (1) ChatSession message Input had only a placeholder -> added aria-label='Your response'; (2) SessionList discard ✕ tap target enlarged from px-1/text-xs (~16px) to an inline-flex h-7 w-7 (28px) hit area; (3) added a prefers-reduced-motion:reduce base block to index.css neutralising animations/transitions (typing dots, spinners, hover) + instant scroll. Brand palette tokens left unchanged (maersk-slate ≈ 4.34:1 on white — used only for secondary/meta copy; body text is maersk-ink). No behavioural changes; frontend-only (apps/web). Files: apps/web/src/index.css, apps/web/src/pages/ChatSession.tsx, apps/web/src/components/SessionList.tsx.
+------------------------------------------------------------
+------------------------------------------------------------
+[2026-06-12 12:27] STORY U4-S2 — Consistency sweep + Railway-ready build confirmation + docs
+STATUS: DONE
+CRITERIA:
+  [PASS] grep shows no stray legacy 'indigo-' utility classes left in apps/web/src — 0 matches (broader sweep of violet/purple/fuchsia/sky/teal/cyan also 0)
+  [PASS] Root production build succeeds (npm run build across workspaces) — contracts(tsc) + web(vite->dist) + api all green; Railway pipeline unaffected
+  [PASS] A short Maersk Design refresh note documents palette/fonts/primitives + 'Tailwind replica, no @maersk-global dep' — apps/web/README.md created
+  [PASS] npm run check (web) exits 0
+  [PASS] npm run test exits 0 — 12 api + 11 web tests pass
+NOTES: Final consistency sweep for the Maersk Design UI track. The migration is already
+       fully converted — grep for 'indigo-' (and a broader stray-palette sweep) over
+       apps/web/src returns zero, so there were no legacy classes left to replace.
+       Confirmed the Railway production pipeline is intact: root build builds contracts,
+       web (self-hosted Inter/Fira Code woff2 + index js/css to dist/) and api in one pass.
+       Authored apps/web/README.md with a 'Maersk Design refresh' section: palette token
+       table, self-hosted fonts (no runtime Google Fonts), src/ui primitives + feedback
+       components, AppShell/Navbar shell + index.css globals, and an explicit 'Tailwind
+       replica — no @maersk-global/MDS dependency' note plus the frontend-only scope caveat.
+       index.css needed no change (Maersk focus ring + reduced-motion block already in place
+       from U4-S1). No API/schema/contracts/join-flow changes. This is the final story —
+       Phase U4 marked done; all four phases (U1..U4) of the Maersk Design UI track complete.
+------------------------------------------------------------

@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { Badge } from '../ui'
 
 interface Session {
   id: string
@@ -26,7 +27,7 @@ interface Props {
 export default function SessionList({ sessions, onDelete }: Props) {
   if (sessions.length === 0) {
     return (
-      <p className="text-sm text-gray-500 italic">
+      <p className="text-sm text-maersk-slate italic">
         No sessions yet — share the link above to invite stakeholders.
       </p>
     )
@@ -48,7 +49,7 @@ export default function SessionList({ sessions, onDelete }: Props) {
 
   return (
     <div>
-      <p className="text-sm text-gray-500 mb-3">
+      <p className="text-sm text-maersk-slate mb-3">
         {total} session{total !== 1 ? 's' : ''} — {complete} complete
       </p>
       <ul className="space-y-2">
@@ -56,22 +57,18 @@ export default function SessionList({ sessions, onDelete }: Props) {
           <li key={s.id}>
             <Link
               to={`/session/${s.id}`}
-              className="flex items-center justify-between bg-gray-50 hover:bg-gray-100 transition-colors rounded-lg px-4 py-3"
+              className="group flex items-center justify-between rounded-mds border border-maersk-steel/40 bg-white px-4 py-3 transition-colors hover:border-maersk-blue hover:bg-primary-50"
             >
-              <div>
-                <span className="font-medium text-gray-900">{s.name}</span>
-                <span className="text-gray-500 text-sm ml-2">{s.role}</span>
+              <div className="min-w-0">
+                <span className="font-medium text-maersk-ink">{s.name}</span>
+                <span className="ml-2 text-sm text-maersk-slate">{s.role}</span>
               </div>
               <div className="flex items-center gap-3">
-                <span className="text-xs text-gray-400">{relativeTime(s.createdAt)}</span>
+                <span className="text-xs text-maersk-slate">{relativeTime(s.createdAt)}</span>
                 {s.status === 'complete' ? (
-                  <span className="text-xs font-medium bg-green-100 text-green-700 px-2 py-0.5 rounded-full">
-                    Complete
-                  </span>
+                  <Badge color="green">Complete</Badge>
                 ) : (
-                  <span className="text-xs font-medium bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-full">
-                    Active
-                  </span>
+                  <Badge color="amber">Active</Badge>
                 )}
                 {s.status === 'active' && onDelete && (
                   <button
@@ -79,7 +76,7 @@ export default function SessionList({ sessions, onDelete }: Props) {
                     onClick={(e) => handleDelete(e, s)}
                     aria-label={`Discard ${s.name}'s interview`}
                     title="Discard this interview"
-                    className="text-gray-400 hover:text-red-600 transition-colors text-xs px-1"
+                    className="inline-flex h-7 w-7 items-center justify-center rounded text-sm text-maersk-slate transition-colors hover:text-red-600"
                   >
                     ✕
                   </button>

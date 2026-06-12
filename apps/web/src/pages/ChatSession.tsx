@@ -1,6 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { apiFetch } from '../lib/api'
+import { Badge, Button, Card, Input, Spinner } from '../ui'
+import { ErrorBanner } from '../components/feedback'
+import { cn } from '../ui/cn'
 
 interface Message {
   role: 'user' | 'assistant'
@@ -41,6 +44,15 @@ interface SessionInfo {
     description: string
     shareToken: string
   }
+}
+
+/** Maersk avatar mark for the assistant (Claude) bubbles. */
+function AssistantAvatar() {
+  return (
+    <div className="mr-2 mt-1 flex h-7 w-7 flex-shrink-0 items-center justify-center overflow-hidden rounded-[6px] bg-maersk-blue">
+      <img src="/pmark.svg" alt="" width={28} height={28} className="h-7 w-7" />
+    </div>
+  )
 }
 
 export default function ChatSession() {
@@ -133,12 +145,9 @@ export default function ChatSession() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="flex items-center gap-2 text-gray-400 text-sm">
-          <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
-            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
-          </svg>
+      <div className="flex min-h-screen items-center justify-center bg-maersk-surface">
+        <div className="flex items-center gap-2 text-sm text-maersk-slate">
+          <Spinner size="sm" />
           Loading session…
         </div>
       </div>
@@ -147,48 +156,39 @@ export default function ChatSession() {
 
   if (loadError) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
-        <div className="text-center max-w-sm">
-          <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg className="w-6 h-6 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01M12 3a9 9 0 100 18A9 9 0 0012 3z" />
-            </svg>
-          </div>
-          <h1 className="text-xl font-bold text-gray-900 mb-2">Unable to load session</h1>
-          <p className="text-gray-500 text-sm">{loadError}</p>
-        </div>
+      <div className="flex min-h-screen items-center justify-center bg-maersk-surface px-4">
+        <Card className="max-w-md text-center">
+          <h1 className="mb-2 text-xl font-bold text-maersk-ink">Unable to load session</h1>
+          <p className="text-sm text-maersk-slate">{loadError}</p>
+        </Card>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
-      <div className="bg-white border-b border-gray-200 px-4 py-3 flex-shrink-0">
-        <div className="max-w-2xl mx-auto flex items-start justify-between">
-          <div>
+    <div className="flex min-h-screen flex-col bg-maersk-surface">
+      <header className="flex-shrink-0 border-t-4 border-maersk-blue border-b border-maersk-steel/50 bg-white px-4 py-3">
+        <div className="mx-auto flex max-w-2xl items-start justify-between gap-4">
+          <div className="min-w-0">
             <div className="flex items-center gap-2">
-              <p className="text-xs font-semibold text-indigo-600 uppercase tracking-wide">ClaudePRD Interview</p>
-              {session?.mode === 'guided' && (
-                <span className="text-[10px] font-semibold uppercase tracking-wide bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full">
-                  Guided
-                </span>
-              )}
+              <p className="text-xs font-semibold uppercase tracking-wide text-maersk-blue">
+                Maersk PRD Studio Interview
+              </p>
+              {session?.mode === 'guided' && <Badge color="blue">Guided</Badge>}
             </div>
             {session && (
-              <p className="text-sm text-gray-600">{session.name} · {session.role}</p>
+              <p className="text-sm text-maersk-slate">{session.name} · {session.role}</p>
             )}
             {session && (
               <div className="mt-1.5">
-                <p className="text-sm font-semibold text-gray-900">{session.project.name}</p>
-                <p className="text-xs text-gray-500 mt-0.5">{session.project.description}</p>
+                <p className="truncate text-sm font-semibold text-maersk-ink">{session.project.name}</p>
+                <p className="mt-0.5 truncate text-xs text-maersk-slate">{session.project.description}</p>
               </div>
             )}
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-shrink-0 items-center gap-3">
             {sessionComplete ? (
-              <span className="inline-flex items-center text-xs bg-green-100 text-green-700 px-2.5 py-1 rounded-full font-medium">
-                Complete
-              </span>
+              <Badge color="green">Complete</Badge>
             ) : (
               session && (
                 <button
@@ -205,7 +205,7 @@ export default function ChatSession() {
                       setSendError((err as Error).message)
                     }
                   }}
-                  className="text-xs text-gray-500 hover:text-red-600 underline underline-offset-2"
+                  className="rounded text-xs text-maersk-slate underline underline-offset-2 transition-colors hover:text-red-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-maersk-blue"
                 >
                   Discard & start over
                 </button>
@@ -214,7 +214,7 @@ export default function ChatSession() {
           </div>
         </div>
         {!sessionComplete && (
-          <div className="max-w-2xl mx-auto mt-3 grid grid-cols-2 sm:grid-cols-4 gap-2">
+          <div className="mx-auto mt-3 grid max-w-2xl grid-cols-2 gap-2 sm:grid-cols-4">
             {AREA_LABELS.map(({ key, label }) => {
               const score = coverage[key]
               const pct = Math.min(100, Math.round((score / 3) * 100))
@@ -222,12 +222,15 @@ export default function ChatSession() {
               return (
                 <div key={key} className="flex flex-col gap-1">
                   <div className="flex items-center justify-between text-[10px] font-medium tracking-wide">
-                    <span className={done ? 'text-green-700' : 'text-gray-500'}>{label}</span>
+                    <span className={done ? 'text-green-700' : 'text-maersk-slate'}>{label}</span>
                     {done && <span className="text-green-600">✓</span>}
                   </div>
-                  <div className="h-1 bg-gray-200 rounded-full overflow-hidden">
+                  <div className="h-1 overflow-hidden rounded-full bg-maersk-steel/40">
                     <div
-                      className={`h-full rounded-full transition-all ${done ? 'bg-green-500' : 'bg-indigo-400'}`}
+                      className={cn(
+                        'h-full rounded-full transition-all',
+                        done ? 'bg-green-500' : 'bg-maersk-blue'
+                      )}
                       style={{ width: `${pct}%` }}
                     />
                   </div>
@@ -236,23 +239,20 @@ export default function ChatSession() {
             })}
           </div>
         )}
-      </div>
+      </header>
 
       <div className="flex-1 overflow-y-auto px-4 py-6">
-        <div className="max-w-2xl mx-auto space-y-4">
+        <div className="mx-auto max-w-2xl space-y-4">
           {messages.map((msg, i) => (
             <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-              {msg.role === 'assistant' && (
-                <div className="flex-shrink-0 w-7 h-7 rounded-full bg-indigo-600 flex items-center justify-center mr-2 mt-1">
-                  <span className="text-white text-xs font-bold">C</span>
-                </div>
-              )}
+              {msg.role === 'assistant' && <AssistantAvatar />}
               <div
-                className={`max-w-prose px-4 py-3 rounded-2xl text-sm whitespace-pre-wrap leading-relaxed ${
+                className={cn(
+                  'max-w-prose whitespace-pre-wrap rounded-2xl px-4 py-3 text-sm leading-relaxed',
                   msg.role === 'user'
-                    ? 'bg-indigo-600 text-white rounded-tr-sm'
-                    : 'bg-white border border-gray-200 text-gray-800 rounded-tl-sm'
-                }`}
+                    ? 'rounded-tr-sm bg-maersk-blue text-white'
+                    : 'rounded-tl-sm border border-maersk-steel/50 bg-white text-maersk-ink shadow-mds'
+                )}
               >
                 {msg.content}
               </div>
@@ -261,20 +261,18 @@ export default function ChatSession() {
 
           {sending && (
             <div className="flex justify-start">
-              <div className="flex-shrink-0 w-7 h-7 rounded-full bg-indigo-600 flex items-center justify-center mr-2 mt-1">
-                <span className="text-white text-xs font-bold">C</span>
-              </div>
-              <div className="bg-white border border-gray-200 px-4 py-3 rounded-2xl rounded-tl-sm flex items-center gap-1">
+              <AssistantAvatar />
+              <div className="flex items-center gap-1 rounded-2xl rounded-tl-sm border border-maersk-steel/50 bg-white px-4 py-3 shadow-mds">
                 <span
-                  className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce"
+                  className="h-1.5 w-1.5 animate-bounce rounded-full bg-maersk-slate"
                   style={{ animationDelay: '0ms' }}
                 />
                 <span
-                  className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce"
+                  className="h-1.5 w-1.5 animate-bounce rounded-full bg-maersk-slate"
                   style={{ animationDelay: '150ms' }}
                 />
                 <span
-                  className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce"
+                  className="h-1.5 w-1.5 animate-bounce rounded-full bg-maersk-slate"
                   style={{ animationDelay: '300ms' }}
                 />
               </div>
@@ -285,27 +283,27 @@ export default function ChatSession() {
         </div>
       </div>
 
-      <div className="bg-white border-t border-gray-200 px-4 py-4 flex-shrink-0">
-        <div className="max-w-2xl mx-auto">
+      <div className="flex-shrink-0 border-t border-maersk-steel/50 bg-white px-4 py-4">
+        <div className="mx-auto max-w-2xl">
           {sendError && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-3 py-2 rounded-lg mb-3 text-xs">
+            <ErrorBanner onDismiss={() => setSendError(null)} className="mb-3">
               {sendError}
-            </div>
+            </ErrorBanner>
           )}
           {sessionComplete ? (
-            <p className="text-center text-gray-400 text-sm">
+            <p className="text-center text-sm text-maersk-slate">
               Interview complete — thank you for your contribution!
             </p>
           ) : (
             <>
               {quickReplies.length > 0 && !sending && (
-                <div className="flex flex-wrap gap-2 mb-3">
+                <div className="mb-3 flex flex-wrap gap-2">
                   {quickReplies.map((opt, i) => (
                     <button
                       key={`${i}-${opt}`}
                       type="button"
                       onClick={() => setInput(opt)}
-                      className="text-sm border border-indigo-200 bg-indigo-50 hover:bg-indigo-100 text-indigo-800 rounded-full px-3 py-1.5 transition-colors"
+                      className="rounded-full border border-maersk-blue/30 bg-primary-50 px-3 py-1.5 text-sm text-primary-700 transition-colors hover:bg-primary-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-maersk-blue"
                     >
                       {opt}
                     </button>
@@ -313,21 +311,18 @@ export default function ChatSession() {
                 </div>
               )}
               <form onSubmit={handleSend} className="flex gap-2">
-                <input
+                <Input
                   type="text"
                   value={input}
                   onChange={e => setInput(e.target.value)}
                   disabled={sending}
+                  aria-label="Your response"
                   placeholder={sending ? 'Claude is thinking…' : 'Type your response…'}
-                  className="flex-1 border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
+                  className="flex-1"
                 />
-                <button
-                  type="submit"
-                  disabled={sending || !input.trim()}
-                  className="bg-indigo-600 text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                >
+                <Button type="submit" disabled={sending || !input.trim()}>
                   Send
-                </button>
+                </Button>
               </form>
             </>
           )}
@@ -335,24 +330,19 @@ export default function ChatSession() {
       </div>
 
       {showOverlay && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-4">
-          <div className="bg-white rounded-2xl p-8 max-w-md w-full text-center shadow-xl">
-            <div className="w-14 h-14 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg className="w-7 h-7 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
+          <Card className="w-full max-w-md text-center shadow-xl">
+            <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-green-100">
+              <svg className="h-7 w-7 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
               </svg>
             </div>
-            <h2 className="text-xl font-bold text-gray-900 mb-2">Interview complete!</h2>
-            <p className="text-gray-600 text-sm mb-6">
+            <h2 className="mb-2 text-xl font-bold text-maersk-ink">Interview complete!</h2>
+            <p className="mb-6 text-sm text-maersk-slate">
               Thank you for your contribution. The PRD is being updated with your insights.
             </p>
-            <button
-              onClick={() => setShowOverlay(false)}
-              className="bg-indigo-600 text-white px-6 py-2.5 rounded-xl text-sm font-medium hover:bg-indigo-700 transition-colors"
-            >
-              Close
-            </button>
-          </div>
+            <Button onClick={() => setShowOverlay(false)}>Close</Button>
+          </Card>
         </div>
       )}
     </div>

@@ -1,5 +1,5 @@
 {
-  "name": "@claudeprd/contracts",
+  "name": "@maersk-prd-studio/contracts",
   "version": "0.1.0",
   "private": true,
   "main": "./dist/index.js",

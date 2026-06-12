@@ -1,5 +1,5 @@
 import { Router, Request, Response } from 'express'
-import { CreateSessionSchema, SendMessageSchema, Message } from '@claudeprd/contracts'
+import { CreateSessionSchema, SendMessageSchema, Message } from '@maersk-prd-studio/contracts'
 import prisma from '../lib/prisma'
 import {
   buildInterviewSystemPrompt,

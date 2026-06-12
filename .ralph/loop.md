@@ -1,15 +1,15 @@
-# Ralph Loop Instructions — ClaudePRD Project
+# Ralph Loop Instructions — Maersk PRD Studio
 
 ## How to run
 ```bash
-cd C:\Users\chris\ClaudePRD
+cd "C:\Users\CGR126\OneDrive - Maersk Group\Claude\maersk-prd-studio"
 .ralph/ralph.sh 30           # run up to 30 iterations
 .ralph/ralph-once.sh         # run one iteration
 ```
 
 ## What this project is
 
-ClaudePRD is a multi-user web app for AI-powered PRD generation. A project creator
+Maersk PRD Studio is a multi-user web app for AI-powered PRD generation. A project creator
 sets up a project (name, description, topic), shares a link, and stakeholders visit
 to have a role-adaptive Claude interview. Claude asks drilling questions, detects when
 coverage is complete, synthesizes all session inputs into a live shared PRD. The PRD
