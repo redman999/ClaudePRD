@@ -242,7 +242,7 @@
   {
     "id": "U4",
     "name": "Phase U4 — Responsive, accessibility & deploy polish",
-    "status": "active",
+    "status": "done",
     "goal": "Final consistency sweep: responsiveness at 375px, accessible focus/contrast, a consistency audit, and confirmation the build is Railway-ready via the existing pipeline.",
     "stories": [
       {
@@ -268,7 +268,9 @@
         "id": "U4-S2",
         "title": "Consistency sweep + Railway-ready build confirmation + docs",
         "description": "Final sweep: remove leftover legacy indigo/ad-hoc styles in favour of Maersk tokens/primitives (grep for stray 'indigo' classes), ensure spacing/typography are consistent, and confirm the production build works through the existing Railway pipeline (root build → web build → api serves SPA). Add a short 'Maersk Design refresh' note to a UI section of the project (e.g. apps/web/README.md or CLAUDE.md) describing the palette, fonts, primitives, and that it is a Tailwind replica (no @maersk-global dependency). Do not change Railway config or the API.",
-        "status": "todo",
+        "status": "done",
+        "completed": "2026-06-12",
+        "completion_notes": "Final consistency sweep + docs. Verified the Maersk migration is complete: grep for 'indigo-' across apps/web/src returns zero matches (and a broader sweep for other stray ad-hoc palettes — violet/purple/fuchsia/sky/teal/cyan — also returns zero), so no legacy utility classes remain to convert. Confirmed the Railway production pipeline is unaffected: root 'npm run build' (build --workspaces) builds contracts (tsc), web (vite -> dist/ with self-hosted Inter/Fira Code woff2 + index js/css) and api in one pass, all green. Authored apps/web/README.md with a 'Maersk Design refresh' section documenting the palette (maersk blue/blue-deep/steel/slate/amber/ink/surface token table), the self-hosted Inter+Fira Code fonts (no runtime Google Fonts), the src/ui primitives (Button/Card/Input/Badge/Spinner + cn()) and feedback components, the AppShell/Navbar shell + index.css globals, and an explicit 'Tailwind replica of Maersk Design — no @maersk-global/MDS dependency (not on a reachable registry, would not build on Railway)' note plus the frontend-only scope caveat. index.css required no change (already clean — Maersk focus ring + reduced-motion block in place from U4-S1). No API/schema/contracts/join-flow changes. check (web) exits 0 + root build succeeds + repo-root test (12 api + 11 web) all green.",
         "acceptance_criteria": [
           "grep shows no stray legacy 'indigo-' utility classes left in apps/web/src",
           "Root production build succeeds (npm run build across workspaces) — Railway pipeline unaffected",

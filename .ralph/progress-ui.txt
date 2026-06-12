@@ -161,3 +161,25 @@ CRITERIA:
   [PASS] npm run test exits 0 — api 12/12 + web 11/11 passed
 NOTES: Accessibility/responsive sweep across all five pages and shared components. The Maersk Blue focus-visible ring (global *:focus-visible in index.css) was already applied consistently and responsive collapse at 375px was sound, so no layout rewrites were needed. Three genuine fixes: (1) ChatSession message Input had only a placeholder -> added aria-label='Your response'; (2) SessionList discard ✕ tap target enlarged from px-1/text-xs (~16px) to an inline-flex h-7 w-7 (28px) hit area; (3) added a prefers-reduced-motion:reduce base block to index.css neutralising animations/transitions (typing dots, spinners, hover) + instant scroll. Brand palette tokens left unchanged (maersk-slate ≈ 4.34:1 on white — used only for secondary/meta copy; body text is maersk-ink). No behavioural changes; frontend-only (apps/web). Files: apps/web/src/index.css, apps/web/src/pages/ChatSession.tsx, apps/web/src/components/SessionList.tsx.
 ------------------------------------------------------------
+------------------------------------------------------------
+[2026-06-12 12:27] STORY U4-S2 — Consistency sweep + Railway-ready build confirmation + docs
+STATUS: DONE
+CRITERIA:
+  [PASS] grep shows no stray legacy 'indigo-' utility classes left in apps/web/src — 0 matches (broader sweep of violet/purple/fuchsia/sky/teal/cyan also 0)
+  [PASS] Root production build succeeds (npm run build across workspaces) — contracts(tsc) + web(vite->dist) + api all green; Railway pipeline unaffected
+  [PASS] A short Maersk Design refresh note documents palette/fonts/primitives + 'Tailwind replica, no @maersk-global dep' — apps/web/README.md created
+  [PASS] npm run check (web) exits 0
+  [PASS] npm run test exits 0 — 12 api + 11 web tests pass
+NOTES: Final consistency sweep for the Maersk Design UI track. The migration is already
+       fully converted — grep for 'indigo-' (and a broader stray-palette sweep) over
+       apps/web/src returns zero, so there were no legacy classes left to replace.
+       Confirmed the Railway production pipeline is intact: root build builds contracts,
+       web (self-hosted Inter/Fira Code woff2 + index js/css to dist/) and api in one pass.
+       Authored apps/web/README.md with a 'Maersk Design refresh' section: palette token
+       table, self-hosted fonts (no runtime Google Fonts), src/ui primitives + feedback
+       components, AppShell/Navbar shell + index.css globals, and an explicit 'Tailwind
+       replica — no @maersk-global/MDS dependency' note plus the frontend-only scope caveat.
+       index.css needed no change (Maersk focus ring + reduced-motion block already in place
+       from U4-S1). No API/schema/contracts/join-flow changes. This is the final story —
+       Phase U4 marked done; all four phases (U1..U4) of the Maersk Design UI track complete.
+------------------------------------------------------------
