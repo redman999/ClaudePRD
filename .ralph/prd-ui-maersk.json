@@ -10,7 +10,9 @@
         "id": "U1-S1",
         "title": "Extend Tailwind theme with Maersk Design tokens",
         "description": "Edit apps/web/tailwind.config.ts to add a Maersk palette under theme.extend.colors: maersk: { blue:'#42b0d5', 'blue-deep':'#00a3e0', steel:'#b0c4d8', slate:'#6b7b8d', amber:'#f0b429', ink:'#141b25', surface:'#f0f4f8' } and a primary scale aliased to Maersk Blue. Add fontFamily.sans = ['Inter','system-ui','-apple-system','sans-serif'] and fontFamily.mono = ['Fira Code','ui-monospace','monospace']. Add a borderRadius token (e.g. 'mds' = '0.5rem') and a subtle shadow ('mds'). Update apps/web/src/index.css base layer: body bg-maersk-surface text-maersk-ink, and a global focus-visible ring in Maersk Blue. Do NOT change any component markup yet.",
-        "status": "todo",
+        "status": "done",
+        "completed": "2026-06-12",
+        "completion_notes": "Added Maersk palette (blue/blue-deep/steel/slate/amber/ink/surface) + primary scale aliased to Maersk Blue, fontFamily sans=Inter / mono=Fira Code, borderRadius.mds and boxShadow.mds to tailwind.config.ts. index.css base layer sets body bg-maersk-surface/text-maersk-ink/font-sans and a global Maersk Blue focus-visible ring. No component markup changed. check/build/test all green.",
         "acceptance_criteria": [
           "tailwind.config.ts defines maersk.blue '#42b0d5', maersk.steel, maersk.slate, maersk.amber and sans=Inter / mono=Fira Code (grep confirms)",
           "index.css base sets the Maersk surface/ink colors and a focus-visible ring",
