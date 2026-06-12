@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import Navbar from '../components/Navbar'
 import { apiFetch } from '../lib/api'
 
 interface ProjectListItem {
@@ -43,10 +42,8 @@ export default function Home() {
   }, [])
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Navbar />
-      <div className="max-w-3xl mx-auto px-4 py-8">
-        <div className="flex items-center justify-between mb-8">
+    <>
+      <div className="flex items-center justify-between mb-8">
           <h1 className="text-xl font-semibold text-gray-900">Projects</h1>
           <Link
             to="/new"
@@ -101,7 +98,6 @@ export default function Home() {
             ))}
           </ul>
         )}
-      </div>
-    </div>
+    </>
   )
 }

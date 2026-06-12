@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import Navbar from '../components/Navbar'
 import SessionList from '../components/SessionList'
 import PrdPreview from '../components/PrdPreview'
 import { apiFetch } from '../lib/api'
@@ -90,10 +89,8 @@ export default function ProjectDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Navbar />
-      <div className="max-w-3xl mx-auto px-4 py-8">
-        {loading && <Skeleton />}
+    <>
+      {loading && <Skeleton />}
 
         {error && (
           <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
@@ -170,7 +167,6 @@ export default function ProjectDashboard() {
             </div>
           </div>
         )}
-      </div>
-    </div>
+    </>
   )
 }

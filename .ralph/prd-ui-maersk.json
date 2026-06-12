@@ -2,7 +2,7 @@
   {
     "id": "U1",
     "name": "Phase U1 — Maersk Design foundation (tokens, fonts, primitives)",
-    "status": "active",
+    "status": "done",
     "goal": "Establish a Maersk Design visual foundation in the existing Tailwind setup: brand color tokens, Inter/Fira Code typography, and a small set of reusable UI primitives. Frontend-only (apps/web); the API and the anonymous share-link/name+role flow are NOT touched.",
     "scope_note": "This is a Tailwind REPLICA of Maersk Design (no @maersk-global packages — they are not on a reachable registry and would not build on Railway). Palette derived from the live Maersk ALP platform: Maersk Blue #42b0d5, deep blue #00a3e0, steel #b0c4d8, slate #6b7b8d, amber #f0b429; Inter (UI) + Fira Code (mono).",
     "stories": [
@@ -74,14 +74,16 @@
   {
     "id": "U2",
     "name": "Phase U2 — App shell, navigation & global states",
-    "status": "pending",
+    "status": "active",
     "goal": "Redesign the app frame: a Maersk-style header/navbar, a consistent page shell/container, and standardized loading/empty/error states using the new primitives.",
     "stories": [
       {
         "id": "U2-S1",
         "title": "Maersk-style Navbar + app shell layout",
         "description": "Redesign apps/web/src/components/Navbar.tsx into a Maersk header: a top brand bar with the Maersk PRD Studio wordmark next to the 'P' logo mark (served at /pmark.svg in apps/web/public), a Maersk Blue accent (e.g. a thin top border or logo block in #42b0d5), Inter type, and a clean white surface with a subtle bottom border. Create apps/web/src/components/AppShell.tsx providing a max-width container, consistent horizontal padding, and vertical rhythm; wrap the routed pages in it. Keep the existing routes/links working (Home link, etc.).",
-        "status": "todo",
+        "status": "done",
+        "completed": "2026-06-12",
+        "completion_notes": "Redesigned Navbar.tsx into a Maersk header: white surface, thin Maersk Blue (#42b0d5) accent stripe (border-t-4 border-maersk-blue), subtle steel bottom border, the /pmark.svg 'P' logo mark next to the 'Maersk PRD Studio' wordmark (Inter via font-sans), whole brand links to '/' with hover -> maersk-blue. Created AppShell.tsx: a presentational frame (flex min-h-screen, bg-maersk-surface, Navbar + a centered max-w-5xl <main> with consistent px/py and flex-1 vertical rhythm). Wired it in App.tsx as a React Router layout route (<AppShell><Outlet/></AppShell>) wrapping the chromed routes (Home, /new, /projects/:id); JoinSession and ChatSession stay full-bleed outside the shell (Chat keeps its full-height flex layout). To avoid double navbars/containers, removed the now-duplicate per-page <Navbar/> import + outer min-h-screen/container wrappers from Home/NewProject/ProjectDashboard (purely subtractive; page CONTENT untouched, so U3 redesigns are unaffected). NewProject form kept constrained at max-w-2xl. check/build (web) + repo-root test (12 api + 7 web) all green.",
         "acceptance_criteria": [
           "Navbar renders the brand with a Maersk Blue accent and Inter type; existing Home navigation still works",
           "AppShell wraps pages with a max-width container + consistent padding (used in App.tsx)",

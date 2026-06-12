@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import Navbar from '../components/Navbar'
 import { apiFetch } from '../lib/api'
 
 interface FormValues {
@@ -76,10 +75,8 @@ export default function NewProject() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Navbar />
-      <div className="max-w-2xl mx-auto px-4 py-8">
-        <h1 className="text-2xl font-bold text-gray-900 mb-6">New Project</h1>
+    <div className="mx-auto max-w-2xl">
+      <h1 className="text-2xl font-bold text-gray-900 mb-6">New Project</h1>
 
         {apiError && (
           <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6 text-sm">
@@ -181,7 +178,6 @@ export default function NewProject() {
             </button>
           </div>
         </form>
-      </div>
     </div>
   )
 }
