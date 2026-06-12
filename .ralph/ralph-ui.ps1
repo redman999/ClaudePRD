@@ -44,7 +44,7 @@ steel #b0c4d8, slate #6b7b8d, amber #f0b429; Inter (UI) + Fira Code (mono).
    one-line note (a human will eyeball them) — do NOT fail the story on a [MANUAL] line, but DO make
    the change the criterion describes. All non-[MANUAL] criteria must genuinely pass.
 
-4. Update ./$prd: mark the story status "done", add a "completed" date and a "completion_notes" string.
+4. Update ./${prd} — mark the story status "done", add a "completed" date and a "completion_notes" string.
 
 5. Append a structured iteration report to ./$log (header line with timestamp + story id + status; a
    CRITERIA block with PASS/FAIL/SKIP per criterion; a NOTES paragraph). Create the file if absent.
