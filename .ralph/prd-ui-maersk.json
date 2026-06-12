@@ -49,7 +49,9 @@
         "id": "U1-S3",
         "title": "Create Maersk UI primitives: Button, Card, Input, Badge, Spinner",
         "description": "Create apps/web/src/ui/ with small, reusable, typed components styled to Maersk Design: Button (variants: primary=Maersk Blue solid, secondary=steel outline, ghost; sizes sm/md; loading state), Card (white surface, mds radius+shadow, optional header), Input + Textarea + Label (steel border, Maersk Blue focus ring, error state), Badge (status colors: blue/green/amber/slate), Spinner. Export from apps/web/src/ui/index.ts. Add a lightweight cn() class-merge helper (clsx). Do not yet refactor pages to use them (that is U2/U3) — but render them in a tiny throwaway story/test to prove they compile and accept props.",
-        "status": "todo",
+        "status": "done",
+        "completed": "2026-06-12",
+        "completion_notes": "Added apps/web/src/ui/ with typed Maersk primitives: Button (primary=Maersk Blue solid / secondary=steel outline / ghost; sizes sm/md; loading spinner + aria-busy, forwardRef), Card (white surface, rounded-mds + shadow-mds, optional header w/ steel divider), Input + Textarea + Label (steel border, Maersk Blue focus ring, error state, forwardRef), Badge (blue/green/amber/slate status colors), Spinner (role=status, animate-spin, currentColor). Added a dependency-free cn() class-merge helper (clsx-style; no clsx dep needed -> offline-safe) and barrel index.ts exporting all components + types. ui.test.tsx renders Button(primary+loading), Badge, Card, Input+Label(error) and Spinner via react-dom/server renderToStaticMarkup (no jsdom/testing-library dep) asserting markup + cn() behaviour: 7 tests pass. No pages refactored (deferred to U2/U3). check (web) + root test + build (web) all green.",
         "acceptance_criteria": [
           "apps/web/src/ui/{Button,Card,Input,Badge,Spinner}.tsx exist and are exported from ui/index.ts",
           "A unit/render test mounts Button (primary+loading) and Badge and asserts they render",

@@ -33,3 +33,14 @@ CRITERIA:
   [PASS] npm run test exits 0 — api 12/12 passed, web no test files (exit 0)
 NOTES: Added @fontsource/inter@^5 and @fontsource/fira-code@^5 to apps/web dependencies and imported only the needed weights in main.tsx (Inter 400/500/600/700, Fira Code 400) ahead of './index.css'. Fonts are fully self-hosted: Vite fingerprints and bundles the woff2/woff files, so there is no runtime Google Fonts request — Maersk-network friendly and Railway-safe. No @maersk-global packages added (Tailwind-replica constraint respected). index.css base already maps body to font-sans=Inter from U1-S1, so the fonts apply without further markup changes.
 ------------------------------------------------------------
+------------------------------------------------------------
+[2026-06-12 10:12] STORY U1-S3 — Create Maersk UI primitives: Button, Card, Input, Badge, Spinner
+STATUS: DONE
+CRITERIA:
+  [PASS] apps/web/src/ui/{Button,Card,Input,Badge,Spinner}.tsx exist and are exported from ui/index.ts — barrel index.ts re-exports all components + their prop/variant types; cn helper also exported
+  [PASS] A unit/render test mounts Button (primary+loading) and Badge and asserts they render — ui.test.tsx, 7 tests, asserts label/spinner/aria-busy/disabled/bg-maersk-blue for Button and rounded-full/text-green-700 for Badge (also Card, Input+Label error, Spinner, cn)
+  [PASS] npm run check (web) exits 0 — tsc --noEmit clean (strict, noUnusedLocals/Params)
+  [PASS] npm run test exits 0 — api 12/12 + web 7/7 passed
+  [PASS] npm run build (web) succeeds — vite build OK in ~1.8s (loop.md gate; not in story criteria)
+NOTES: Created apps/web/src/ui/ holding small typed Maersk Design primitives. Button: primary=Maersk Blue solid, secondary=steel outline, ghost; sizes sm/md; loading state renders a Spinner + sets disabled/aria-busy; forwardRef. Card: white surface, rounded-mds + shadow-mds, optional header above a steel divider. Input + Textarea + Label: steel border, Maersk Blue focus ring (focus:ring-maersk-blue), error border state, amber required marker; forwardRef. Badge: blue/green/amber/slate status pills. Spinner: role=status, animate-spin, inherits currentColor (Maersk Blue default). cn() is a dependency-free clsx-style merge helper (strings/falsy/arrays/object syntax) so NO clsx dependency was added — keeps the build offline-safe per the Tailwind-replica constraint. No @maersk-global packages. The render test uses react-dom/server renderToStaticMarkup, so no jsdom/@testing-library devDeps were needed. Per the story, NO pages were refactored to use the primitives (deferred to U2/U3); components are proven only via the test. The ui/ module is currently tree-shaken from the production bundle since no page imports it yet — expected, build still succeeds.
+------------------------------------------------------------
