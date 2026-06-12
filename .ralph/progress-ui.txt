@@ -22,3 +22,14 @@ CRITERIA:
   [PASS] npm run test exits 0 — api 12/12 passed, web no test files (exit 0)
 NOTES: Added a Maersk Design palette under theme.extend.colors (maersk.blue #42b0d5, blue-deep #00a3e0, steel #b0c4d8, slate #6b7b8d, amber #f0b429, ink #141b25, surface #f0f4f8) plus a primary 50-900 scale aliased to Maersk Blue. Added fontFamily.sans=[Inter,...] / mono=[Fira Code,...], borderRadius.mds=0.5rem, and a subtle boxShadow.mds. index.css base layer now sets body bg-maersk-surface/text-maersk-ink/font-sans/antialiased and a global Maersk Blue focus-visible ring. No component markup changed (per story scope). Foundation-only; fonts are wired up in U1-S2.
 ------------------------------------------------------------
+------------------------------------------------------------
+[2026-06-12 10:09] STORY U1-S2 — Load Inter + Fira Code fonts (self-hosted, offline-safe)
+STATUS: DONE
+CRITERIA:
+  [PASS] Inter and Fira Code bundled locally (no fonts.googleapis.com/gstatic) — grep of dist = 0 external font URLs; woff2 emitted under dist/assets/inter-*.woff2
+  [PASS] Computed body font-family resolves to Inter — built index CSS contains the Inter @font-face; body uses font-sans (Inter) from the base layer
+  [PASS] npm run check (web) exits 0 — tsc --noEmit clean
+  [PASS] npm run build (web) succeeds — vite build, fonts emitted as hashed assets, built in ~1.7s
+  [PASS] npm run test exits 0 — api 12/12 passed, web no test files (exit 0)
+NOTES: Added @fontsource/inter@^5 and @fontsource/fira-code@^5 to apps/web dependencies and imported only the needed weights in main.tsx (Inter 400/500/600/700, Fira Code 400) ahead of './index.css'. Fonts are fully self-hosted: Vite fingerprints and bundles the woff2/woff files, so there is no runtime Google Fonts request — Maersk-network friendly and Railway-safe. No @maersk-global packages added (Tailwind-replica constraint respected). index.css base already maps body to font-sans=Inter from U1-S1, so the fonts apply without further markup changes.
+------------------------------------------------------------

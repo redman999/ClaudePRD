@@ -29,7 +29,9 @@
         "id": "U1-S2",
         "title": "Load Inter + Fira Code fonts (self-hosted, offline-safe)",
         "description": "Add the Inter and Fira Code webfonts so the build does not depend on a runtime Google Fonts request (Maersk-network friendly). Prefer @fontsource/inter and @fontsource/fira-code (npm) imported in main.tsx, or vendor the woff2 files under apps/web/src/assets/fonts and @font-face them in index.css. Ensure the fonts actually apply (body renders in Inter). Keep bundle reasonable (only needed weights: 400/500/600/700 for Inter, 400 for Fira Code).",
-        "status": "todo",
+        "status": "done",
+        "completed": "2026-06-12",
+        "completion_notes": "Added @fontsource/inter@^5 and @fontsource/fira-code@^5 to apps/web deps; imported only needed weights in main.tsx (Inter 400/500/600/700, Fira Code 400) before index.css. Fonts are self-hosted/bundled by Vite (dist/assets/inter-*.woff2) with zero runtime fonts.googleapis.com/gstatic requests (grep of dist = 0). Built CSS contains the Inter @font-face; body font-family resolves to Inter via the existing font-sans base style. check/build (web) + repo-root test all green.",
         "acceptance_criteria": [
           "Inter and Fira Code are bundled locally (no external fonts.googleapis.com request at runtime)",
           "Computed body font-family resolves to Inter (verify via built CSS / inspection)",
